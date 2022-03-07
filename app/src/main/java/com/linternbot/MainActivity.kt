@@ -19,7 +19,6 @@ import android.widget.ImageView
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 
@@ -38,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         val mainHandler = Handler(Looper.getMainLooper())
         mainHandler.post(object : Runnable {
             override fun run() {
-                Log.d("TAG", "hello")
+                Log.d("HELLO", "hello")
                 mainHandler.postDelayed(this, 1000)
             }
         })
