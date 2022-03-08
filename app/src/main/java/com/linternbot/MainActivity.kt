@@ -1,5 +1,6 @@
 package com.linternbot
 
+
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -8,10 +9,10 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.support.v4.app.NotificationCompat
-import android.support.v4.app.NotificationManagerCompat
-import android.support.v7.app.ActionBar
-import android.support.v7.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.appcompat.app.ActionBar
+import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
@@ -31,16 +32,6 @@ class MainActivity : AppCompatActivity() {
         val button = findViewById<ImageView>(R.id.boton1)
         val button2 = findViewById<ImageView>(R.id.boton2)
         button2.visibility = INVISIBLE
-
-        // Para el envio de mensajes de Still Alive
-        // Fuente: https://stackoverflow.com/questions/55570990/kotlin-call-a-function-every-second
-        val mainHandler = Handler(Looper.getMainLooper())
-        mainHandler.post(object : Runnable {
-            override fun run() {
-                Log.d("HELLO", "hello")
-                mainHandler.postDelayed(this, 1000)
-            }
-        })
 
         // Codigo relaccionado con las notificaciones:
         // https://developer.android.com/training/notify-user/build-notification?hl=es-419
@@ -87,7 +78,7 @@ class MainActivity : AppCompatActivity() {
 
                     // Codigo para aprender a utilizar worker
                     // https://developer.android.com/reference/androidx/work/PeriodicWorkRequest
-                    val myWorkBuilder = PeriodicWorkRequest.Builder(UploadWorker::class.java, 16, TimeUnit.MINUTES)
+                    val myWorkBuilder = PeriodicWorkRequest.Builder(UploadWorker::class.java, PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS+1, TimeUnit.MILLISECONDS)
 
                     val myWork = myWorkBuilder.build()
                     WorkManager.getInstance().enqueueUniquePeriodicWork("jobTag", ExistingPeriodicWorkPolicy.KEEP, myWork)
@@ -99,6 +90,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
         button2.setOnClickListener { // LA LINTERNA ESTA APAGADA
             if (button2.visibility.equals(VISIBLE)) {
                 button.visibility = VISIBLE
