@@ -18,7 +18,7 @@ class UploadWorker(appContext: Context, workerParams: WorkerParameters): Worker(
         // Do the work here--in this case, upload the images.
         val db = Firebase.firestore
         val user = hashMapOf(
-            "Bot ID" to "Movil Nico",
+            "Bot ID" to idAndroid,
             "Hora" to strDate
         )
 

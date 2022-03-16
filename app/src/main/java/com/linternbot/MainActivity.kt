@@ -7,6 +7,7 @@ import android.content.Context
 import android.hardware.camera2.CameraManager
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
@@ -18,8 +19,10 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import java.util.concurrent.TimeUnit
 
+var idAndroid = ""
 
 class MainActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -27,6 +30,11 @@ class MainActivity : AppCompatActivity() {
         actionBar?.hide()
         val button = findViewById<ImageView>(R.id.boton1)
         val button2 = findViewById<ImageView>(R.id.boton2)
+        idAndroid =  Settings.Secure.getString(
+            contentResolver,
+            Settings.Secure.ANDROID_ID
+        )
+
         button2.visibility = INVISIBLE
 
         createNotificationChannel() // Canal de comunicacion de notificaciones necesario en API 26+
