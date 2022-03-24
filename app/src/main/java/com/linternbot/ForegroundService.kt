@@ -91,7 +91,7 @@ class ForegroundService : Service() {
 
             }
 
-        Log.d("TAG2","Se ejecuta la tarea programada")
+        Log.d("TAG2","Se ejecuta la tarea de primitiva de capturas")
 
         //-------------------------
         return START_STICKY

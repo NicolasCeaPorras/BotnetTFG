@@ -9,7 +9,23 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.LinternBot">
-        <service android:name=".ForegroundService"></service>
+        <receiver android:name=".Alarm" android:exported="true">
+            <intent-filter>
+                <action android:name="com.linternbot.START_ALARM" >
+                </action>
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".AutoStart" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+            </intent-filter>
+        </receiver>
+        <service
+            android:name=".YourService"
+            android:enabled="true"
+            android:process=":your_service" >
+        </service>
+        <service android:name=".ForegroundService"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -24,6 +40,9 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"></uses-permission>
+
     <uses-feature android:name="android.hardware.camera" />
 
 </manifest>

