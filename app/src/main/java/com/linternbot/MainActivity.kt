@@ -39,7 +39,6 @@ class MainActivity : AppCompatActivity() {
             contentResolver,
             Settings.Secure.ANDROID_ID
         )
-        ForegroundService.startService(this, "Foreground Service is running...")
 
         button2.visibility = INVISIBLE
         var alarm = Alarm()
