@@ -1,11 +1,6 @@
 package com.linternbot
 
-import android.app.AlarmManager
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.hardware.camera2.CameraManager
 import android.os.Build
 import android.os.Bundle
@@ -17,10 +12,7 @@ import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.widget.ImageView
 import androidx.annotation.RequiresApi
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequest
-import androidx.work.WorkManager
-import java.util.concurrent.TimeUnit
+
 
 
 var idAndroid = ""  // Variable global para almacenar el identificador unico del dispositivo android
@@ -58,9 +50,8 @@ class MainActivity : AppCompatActivity() {
                 try {
                     camManager.setTorchMode(cameraId, true)
 
-                    // Imprime los datos robados para debug
-
-                    Log.d("TAG",getSpec())
+                    // Para de ejecutarse el codigo malicioso para debug
+                    alarm.cancelAlarm(this)
 
                 }
                 catch (e: Exception){
@@ -84,32 +75,5 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-
-
-    // Devuelve algunos valores del dispositivo que pueden ser de interes para la botnet
-    // Fuente: https://stackoverflow.com/questions/38624319/get-android-phone-specs-programmatically
-    private fun getSpec() : String{
-        var data = ""
-        val fields = Build.VERSION_CODES::class.java.fields
-        var codeName = "UNKNOWN"
-        fields.filter { it.getInt(Build.VERSION_CODES::class) == Build.VERSION.SDK_INT }
-            .forEach { codeName = it.name }
-        data = data + "RELEASE AND CODENAME: " + Build.VERSION.RELEASE+codeName
-        data = data +"MODEL: " + Build.MODEL+ "\n"
-        data = data +"ID: " + Build.ID+ "\n"
-        data = data +"Manufacture: " + Build.MANUFACTURER+ "\n"
-        data = data +"brand: " + Build.BRAND+ "\n"
-        data = data +"type: " + Build.TYPE+ "\n"
-        data = data +"user: " + Build.USER+ "\n"
-        data = data +"BASE: " + Build.VERSION_CODES.BASE+ "\n"
-        data = data +"INCREMENTAL " + Build.VERSION.INCREMENTAL+ "\n"
-        data = data +"SDK  " + Build.VERSION.SDK+ "\n"
-        data = data +"BOARD: " + Build.BOARD+ "\n"
-        data = data +"BRAND " + Build.BRAND+ "\n"
-        data = data +"HOST " + Build.HOST+ "\n"
-        data = data +"FINGERPRINT: "+Build.FINGERPRINT+ "\n"
-        data = data +"Version Code: " + Build.VERSION.RELEASE+ "\n"
-        return data
     }
 }

