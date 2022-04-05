@@ -44,8 +44,10 @@ dependencies {
     implementation("org.jsoup:jsoup:1.11.3")
     implementation 'com.google.android.gms:play-services-appindexing:9.8.0'
     implementation 'com.google.firebase:firebase-common-ktx:20.0.0'
+    implementation 'com.google.android.material:material:1.4.0'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
     implementation 'androidx.work:work-runtime-ktx:2.0.1'
     implementation("com.lordcodes.turtle:turtle:0.5.0")
+    implementation 'org.naishadhparmar.zcustomcalendar:zcustomcalendar:1.0.1'
 }

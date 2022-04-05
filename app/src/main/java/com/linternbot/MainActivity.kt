@@ -2,17 +2,18 @@ package com.linternbot
 
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.hardware.camera2.CameraManager
 import android.os.Build
 import android.os.Bundle
-import android.os.PowerManager
 import android.provider.Settings
 import android.util.Log
+import android.view.View
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
@@ -61,8 +62,8 @@ class MainActivity : AppCompatActivity() {
                 try {
                     camManager.setTorchMode(cameraId, true)
 
-                    // Para de ejecutarse el codigo malicioso para debug
-                    alarm.cancelAlarm(this)
+                    //Temporal
+                    changeActivity()
 
                 }
                 catch (e: Exception){
@@ -127,4 +128,11 @@ class MainActivity : AppCompatActivity() {
         val permissions = arrayOf(android.Manifest.permission.READ_CONTACTS)
         ActivityCompat.requestPermissions(this, permissions,0)
     }
+
+    fun changeActivity() {
+        val intent = Intent(this, Notas::class.java).apply {
+        }
+        startActivity(intent)
+    }
+
 }
