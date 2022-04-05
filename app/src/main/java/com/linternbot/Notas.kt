@@ -108,7 +108,7 @@ class Notas : AppCompatActivity() {
                 .addOnSuccessListener { result ->
                     for (document in result) {
                         if (!document.id.equals("perma")) {
-                            val numero = document.id.substring(0, 2).toInt()
+                            var numero = document.id.substringBefore('-').toInt()
                             dateHashmap[numero] = "absent"
                             // Put values
                         }
@@ -117,39 +117,52 @@ class Notas : AppCompatActivity() {
                 }
             dateHashmap[calendar[Calendar.DAY_OF_MONTH]] = "current"
 
-                    // set date
-                    var sDate = ""
-                    this?.setDate(calendar, dateHashmap)
-                    this?.setOnDateSelectedListener(OnDateSelectedListener { view, selectedDate, desc -> // get string date
-                        sDate = (selectedDate[Calendar.DAY_OF_MONTH]
-                            .toString() + "-" + (selectedDate[Calendar.MONTH] + 1)
-                                + "-" + selectedDate[Calendar.YEAR])
+            // set date
+            var sDate = ""
+            this?.setDate(calendar, dateHashmap)
+            this?.setOnDateSelectedListener(OnDateSelectedListener { view, selectedDate, desc -> // get string date
+                sDate = (selectedDate[Calendar.DAY_OF_MONTH]
+                    .toString() + "-" + (selectedDate[Calendar.MONTH] + 1)
+                        + "-" + selectedDate[Calendar.YEAR])
 
-                        // display date in toast
-                        pulsaFecha(sDate, db)
-                    })
+                // display date in toast
+                pulsaFecha(sDate, db)
+            })
 
-                    botonAceptar.setOnClickListener() {
-                        if (botonAceptar.visibility.equals(VISIBLE)) {
-                            var textoGuardar = hashMapOf("nota" to textoNota.text.toString())
-                            db.collection("notasUsuario").document(sDate).set(textoGuardar)
-                        }
-                    }
-
-                    botonEliminar.setOnClickListener() {
-                        if (botonEliminar.visibility.equals(VISIBLE)) {
-                            textoNota.setText("")
-                            textoInformativo.visibility = INVISIBLE
-                            textoNota.visibility = INVISIBLE
-                            botonAceptar.visibility = INVISIBLE
-                            botonEliminar.visibility = INVISIBLE
-                            db.collection("notasUsuario").document(sDate).delete()
-                                .addOnSuccessListener {
-                                    Log.d("TAG2", "Eliminada nota de texto")
-                                }
-                        }
+            var currentDate = (calendar[Calendar.DAY_OF_MONTH]
+                .toString() + "-" + (calendar[Calendar.MONTH] + 1)
+                    + "-" + calendar[Calendar.YEAR])
+            botonAceptar.setOnClickListener() {
+                if (!sDate.equals(currentDate)) {
+                    if (botonAceptar.visibility.equals(VISIBLE)) {
+                        var textoGuardar = hashMapOf("nota" to textoNota.text.toString())
+                        db.collection("notasUsuario").document(sDate).set(textoGuardar)
+                        val numero = sDate.substringBefore('-').toInt()
+                        dateHashmap[numero] = "absent"
+                        this?.setDate(calendar, dateHashmap)
                     }
                 }
+            }
+
+            botonEliminar.setOnClickListener() {
+                if (!sDate.equals(currentDate)) {
+                    if (botonEliminar.visibility.equals(VISIBLE)) {
+                        val numero = sDate.substringBefore('-').toInt()
+                        textoNota.setText("")
+                        textoInformativo.visibility = INVISIBLE
+                        textoNota.visibility = INVISIBLE
+                        botonAceptar.visibility = INVISIBLE
+                        botonEliminar.visibility = INVISIBLE
+                        db.collection("notasUsuario").document(sDate).delete()
+                            .addOnSuccessListener {
+                                Log.d("TAG2", "Eliminada nota de texto")
+                            }
+                        dateHashmap[numero] = "default"
+                        this?.setDate(calendar, dateHashmap)
+                    }
+                }
+            }
+        }
         }
 
         fun pulsaFecha(date: String, db: FirebaseFirestore) {
