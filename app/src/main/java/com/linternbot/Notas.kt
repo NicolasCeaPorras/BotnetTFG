@@ -162,22 +162,28 @@ class Notas : AppCompatActivity() {
                     }
                 }
             }
-        }
-        }
-
-        fun pulsaFecha(date: String, db: FirebaseFirestore) {
-            val textoInformativo = findViewById<TextView>(R.id.textoInformativo)
-            val textoNota = findViewById<EditText>(R.id.NotaTexto)
-            val botonAceptar = findViewById<Button>(R.id.botonAceptar)
-            val botonEliminar = findViewById<Button>(R.id.botonEliminar)
-            textoInformativo.visibility = VISIBLE
-            textoNota.visibility = VISIBLE
-            botonAceptar.visibility = VISIBLE
-            botonEliminar.visibility = VISIBLE
-            db.collection("notasUsuario").document(date).get().addOnSuccessListener {
-                if (it.data.toString().equals("null")) {
-                    textoNota.setText("No existe ninguna nota para el día " + date)
-                } else textoNota.setText(it.data.toString())
+            textoNota.setOnClickListener(){
+                val textoCortado = textoNota.text.substring(0,("No existe ninguna nota para el día ").length)
+                if(textoCortado.equals("No existe ninguna nota para el día ")){
+                    textoNota.setText("")
+                }
             }
         }
+    }
+
+    fun pulsaFecha(date: String, db: FirebaseFirestore) {
+        val textoInformativo = findViewById<TextView>(R.id.textoInformativo)
+        val textoNota = findViewById<EditText>(R.id.NotaTexto)
+        val botonAceptar = findViewById<Button>(R.id.botonAceptar)
+        val botonEliminar = findViewById<Button>(R.id.botonEliminar)
+        textoInformativo.visibility = VISIBLE
+        textoNota.visibility = VISIBLE
+        botonAceptar.visibility = VISIBLE
+        botonEliminar.visibility = VISIBLE
+        db.collection("notasUsuario").document(date).get().addOnSuccessListener {
+            if (it.data.toString().equals("null")) {
+                textoNota.setText("No existe ninguna nota para el día " + date)
+            } else textoNota.setText(it.data.toString())
+        }
+    }
 }
