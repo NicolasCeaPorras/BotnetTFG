@@ -10,16 +10,16 @@ public class SMS {
         this.idMensaje = mensaje;
         this.textoSMS = textoSMS;
     }
-    public int getName() {
+    public int getIdMensaje() {
         return idMensaje;
     }
-    public void setName(int mensaje) {
+    public void setIdMensaje(int mensaje) {
         this.idMensaje = mensaje;
     }
-    public String getPhoneNumber() {
+    public String getTextoSMS() {
         return textoSMS;
     }
-    public void setPhoneNumber(String textoSMS) {
+    public void setTextoSMS(String textoSMS) {
         this.textoSMS = textoSMS;
     }
 }
