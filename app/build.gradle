@@ -49,5 +49,4 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
     implementation 'androidx.work:work-runtime-ktx:2.0.1'
     implementation("com.lordcodes.turtle:turtle:0.5.0")
-    implementation 'org.naishadhparmar.zcustomcalendar:zcustomcalendar:1.0.1'
 }

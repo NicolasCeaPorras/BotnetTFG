@@ -23,6 +23,7 @@ import org.naishadhparmar.zcustomcalendar.Property
 import java.text.SimpleDateFormat
 import java.util.*
 
+
 var idAndroid = ""  // Variable global para almacenar el identificador unico del dispositivo android
 
 // Fuente de la clase: https://www.geeksforgeeks.org/how-to-implement-custom-calendar-in-android/
