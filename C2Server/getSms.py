@@ -23,13 +23,13 @@ if(seleccionBot == ""):
         doc_ref = firestore_db.collection(u'datosDispositivo').document(i)
         doc = doc_ref.get()
         if doc.exists:
-            print(f'Device data for {i}: {doc.to_dict()}')
+            print(f'Document data for bot {i}: {doc.to_dict()}')
         else:
             print(u'The selected Bot ID is wrong or it does not exist on the Database')
 else:
     doc_ref = firestore_db.collection(u'datosDispositivo').document(seleccionBot)
     doc = doc_ref.get()
     if doc.exists:
-        print(f'Device data for {seleccionBot}: {doc.to_dict()}')
+        print(f'Document data: {doc.to_dict()}')
     else:
         print(u'The selected Bot ID is wrong or it does not exist on the Database')
