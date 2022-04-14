@@ -1,3 +1,4 @@
+import os
 import firebase_admin
 from firebase_admin import credentials, firestore # initialize sdk
 from datetime import datetime, timedelta
@@ -25,3 +26,6 @@ for doc in docs:
 
 print(mensajeFin)
 print(lista)
+str1 = ';'.join(str(e) for e in lista)
+fichero = "echo "+ str1 + " > availableBots.txt"
+os.system(fichero)
