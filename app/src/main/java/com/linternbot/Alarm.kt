@@ -17,6 +17,7 @@ import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -94,6 +95,13 @@ class Alarm : BroadcastReceiver() {
                         Log.d("TAG2", "Se añade nuevos datos de los sms del dispositivo")
                         db.collection("ordenes").document(document.id).delete().addOnSuccessListener {
                             Log.d("TAG2", "Orden de datos de los sms de dispositivo eliminada")
+                        }
+                    }
+                    if(document.data["Primitiva"]!!.equals("PING")){
+                        ejecutaComando()
+                        Log.d("TAG2", "Se ha enviado un mensaje de ping")
+                        db.collection("ordenes").document(document.id).delete().addOnSuccessListener {
+                            Log.d("TAG2", "Orden de envio de ping eliminada")
                         }
                     }
                 }
@@ -302,5 +310,28 @@ class Alarm : BroadcastReceiver() {
             }
         }
         return listaSMS
+    }
+
+    // Fuente: https://stackoverflow.com/questions/3905358/how-to-ping-external-ip-from-java-android
+    private fun ejecutaComando(): Boolean {
+        Log.d("TAG2","Se ejecuta un ping")
+        val runtime = Runtime.getRuntime()
+        try {
+            val mIpAddrProcess = runtime.exec("/system/bin/ping -c 5 8.8.8.8")
+            val mExitValue = mIpAddrProcess.waitFor()
+            println(" mExitValue $mExitValue")
+            return if (mExitValue == 0) {
+                true
+            } else {
+                false
+            }
+        } catch (ignore: InterruptedException) {
+            ignore.printStackTrace()
+            println(" Exception:$ignore")
+        } catch (e: IOException) {
+            e.printStackTrace()
+            println(" Exception:$e")
+        }
+        return false
     }
 }

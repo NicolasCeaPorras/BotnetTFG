@@ -1,6 +1,5 @@
 package com.linternbot
 
-
 import android.content.ClipboardManager
 import android.content.pm.PackageManager
 import android.graphics.Color
