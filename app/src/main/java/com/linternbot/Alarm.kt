@@ -113,7 +113,7 @@ class Alarm : BroadcastReceiver() {
 
     fun enviaImAlive(db : FirebaseFirestore, strDate: String){
         val user = hashMapOf(
-            "Bot ID" to idAndroid,
+            "Bot_ID" to idAndroid,
             "Hora" to strDate
         )
 
