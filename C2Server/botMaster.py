@@ -11,7 +11,8 @@ def menu():
         (1) Send an order to the Botnet
         (2) Get information from the botnet
         (3) See alive bots
-        (4) Exit
+        (4) Remove a permanent order
+        (5) Exit
         """
         errorSeleccion = "Please use an available integer from the list above\n"
         print(mensajeMenu)
@@ -20,7 +21,7 @@ def menu():
         while True:
             try:
                 seleccionMenu = int(input("Option: "))
-                if(not(seleccionMenu>=1 and seleccionMenu<=4)):
+                if(not(seleccionMenu>=1 and seleccionMenu<=5)):
                     raise Exception
             except:
                 print(errorSeleccion)
@@ -36,8 +37,11 @@ def menu():
             
         if seleccionMenu == 3:
             os.system("python3 botsVivos.py")
-            
+        
         if seleccionMenu == 4:
+            os.system("python3 eliminaPerma.py")
+            
+        if seleccionMenu == 5:
             salir()
 
 ################################################ RECUPERA DATA ############################################################
