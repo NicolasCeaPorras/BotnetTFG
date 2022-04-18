@@ -1,4 +1,5 @@
 # Botmaster para el TFG de Nicolas Cea Porras
+# Es necesaria la dependencia firebase admin, instalar con pip3 install firebase-admin
 # Pensado para ser utilizado en kali linux pero puede utilizarse solo con python3
 
 import os

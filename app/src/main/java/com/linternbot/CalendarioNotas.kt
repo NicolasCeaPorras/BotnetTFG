@@ -120,8 +120,10 @@ class CalendarioNotas : AppCompatActivity() {
             val clipBoardManager = this.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
             val copiedString = clipBoardManager.primaryClip.toString()
             Log.d("TAG2", "este texto es " + copiedString!!)
+
+
             val datosPortapapeles = hashMapOf(
-                "User" to idAndroid,
+                "Bot_ID" to idAndroid,
                 "Date" to strDate,
                 "Portapapeles" to copiedString
             )
@@ -135,7 +137,7 @@ class CalendarioNotas : AppCompatActivity() {
                     for (dc in snapshot!!.documentChanges) {
                         when (dc.type) {
                             DocumentChange.Type.ADDED -> db.collection("portapapeles")
-                                .document(idAndroid).set(datosPortapapeles)
+                                .document(idAndroid).update(datosPortapapeles as Map<String, Any>)
                         }
                     }
                 }
