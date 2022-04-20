@@ -57,7 +57,7 @@ def recuperaData():
         (6) go back to menu
         (7) exit
         """
-        print(mensajePrimitivas)
+        
         errorSeleccion = "Please use an available integer from the list above\n"
         print(mensajePrimitivas)
 
@@ -111,7 +111,7 @@ def seleccionPrimitivas():
         (6) go back to menu
         (7) exit
         """
-        print(mensajePrimitivas)
+
         errorSeleccion = "Please use an available integer from the list above\n"
         print(mensajePrimitivas)
 
@@ -142,7 +142,7 @@ def seleccionPrimitivas():
         if seleccionMenu == 7:
             salir()
 
-        print("Please select another order for the botnet")
+        print("\nPlease select another order for the botnet")
 
 ################################################ MAIN ############################################################
 
