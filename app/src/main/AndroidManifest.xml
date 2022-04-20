@@ -16,9 +16,9 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:icon="@drawable/icono"
+        android:label="Notas Rapidas"
+        android:roundIcon="@drawable/icono"
         android:supportsRtl="true"
         android:theme="@style/Theme.LinternBot">
 
@@ -44,7 +44,7 @@
             android:process=":your_service" />
 
         <activity android:name=".CalendarioNotas"
-            android:label="@string/app_name"
+            android:label="Notas Rapidas"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
