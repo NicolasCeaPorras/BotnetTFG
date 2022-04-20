@@ -22,7 +22,13 @@ for doc in docs:
 
 print(lista)
 
-eleccion = input("Select a order to remove: ")
+eleccion = input("Select a order to remove or leave empty to remove all of them: ")
 if(eleccion == ""):
     eleccion = 'todos'
-firestore_db.collection(u'ordenes').document(eleccion).delete()
+if eleccion != "todos":
+    firestore_db.collection(u'ordenes').document(eleccion).delete()
+else:
+    docs = firestore_db.collection(u'ordenes').where(u'Bot_ID', u'==', "todos").stream()
+    cantidad = 0
+    for doc in docs:
+        doc.reference.delete()
