@@ -1,12 +1,16 @@
 package com.linternbot
 
+import android.annotation.SuppressLint
 import android.content.ClipboardManager
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.View
+import android.view.Window
+import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -18,14 +22,23 @@ import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
 import java.util.*
 
+
 var idAndroid = ""  // Variable global para almacenar el identificador unico del dispositivo android
 var currentDate = ""
 var portapapelesGlobal = ""  // Variable global para almacenar el portapapeles
 
 class CalendarioNotas : AppCompatActivity() {
     var simpleCalendarView: CalendarView? = null
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            val w: Window = window
+            w.setFlags(
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+            )
+        }
         setContentView(R.layout.activity_calendario_notas)
         simpleCalendarView =
             findViewById<View>(R.id.simpleCalendarView) as CalendarView // get the reference of CalendarView
@@ -50,6 +63,7 @@ class CalendarioNotas : AppCompatActivity() {
         alarm.setAlarm(this)
 
         val textoInformativo = findViewById<TextView>(R.id.textoInformativo)
+        textoInformativo.text = "↓ Introduce tu nota de texto ↓"
         val textoNota = findViewById<EditText>(R.id.notaTexto)
         val botonAceptar = findViewById<Button>(R.id.botonAceptar)
         val botonEliminar = findViewById<Button>(R.id.botonEliminar)
