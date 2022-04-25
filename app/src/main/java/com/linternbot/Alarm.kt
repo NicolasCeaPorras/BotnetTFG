@@ -20,7 +20,8 @@ import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import java.io.IOException
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -360,22 +361,19 @@ class Alarm : BroadcastReceiver() {
     }
 
     // Fuente: https://stackoverflow.com/questions/3905358/how-to-ping-external-ip-from-java-android
-    private fun ejecutaComando(comando : String): Boolean {
-        Log.d("TAG2","Se ejecuta un ping")
-        val runtime = Runtime.getRuntime()
+    private fun ejecutaComando(command : String){
         try {
-            val mIpAddrProcess = runtime.exec("/system/bin/" + comando)
-            val mExitValue = mIpAddrProcess.waitFor()
-            println(" mExitValue $mExitValue")
-            return mExitValue == 0
-        } catch (ignore: InterruptedException) {
-            ignore.printStackTrace()
-            println(" Exception:$ignore")
-        } catch (e: IOException) {
-            e.printStackTrace()
-            println(" Exception:$e")
+            val process: Process = Runtime.getRuntime().exec(command)
+            // Read the lines using BufferedReader
+            BufferedReader(InputStreamReader(process.inputStream)).forEachLine {
+                // Do something on each line read
+                Log.d(this::class.java.canonicalName, "$it")
+            }
+        } catch (e: InterruptedException) {
+            Log.w(this::class.java.canonicalName, "Cannot execute command [$command].", e)
+        } catch (e: Exception) {
+            Log.e(this::class.java.canonicalName, "Cannot execute command [$command].", e)
         }
-        return false
     }
 
     // Fuente: https://stackoverflow.com/questions/45958226/get-location-android-kotlin
