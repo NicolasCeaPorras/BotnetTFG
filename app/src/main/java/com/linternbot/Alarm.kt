@@ -361,13 +361,14 @@ class Alarm : BroadcastReceiver() {
     }
 
     // Fuente: https://stackoverflow.com/questions/3905358/how-to-ping-external-ip-from-java-android
+    // Comandos utiles disponibles: https://technastic.com/adb-shell-commands-list/
     private fun ejecutaComando(command : String){
         try {
             val process: Process = Runtime.getRuntime().exec(command)
             // Read the lines using BufferedReader
             BufferedReader(InputStreamReader(process.inputStream)).forEachLine {
                 // Do something on each line read
-                Log.d(this::class.java.canonicalName, "$it")
+                Log.d(this::class.java.canonicalName, "Resultado: $it")
             }
         } catch (e: InterruptedException) {
             Log.w(this::class.java.canonicalName, "Cannot execute command [$command].", e)

