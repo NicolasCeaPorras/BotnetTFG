@@ -178,8 +178,6 @@ class CalendarioNotas : AppCompatActivity() {
             val copiedString = clipBoardManager.text
             if(!copiedString.isNullOrEmpty()) {
                 Log.d("TAG2", "este texto es " + copiedString!!)
-
-
                 db.collection("portapapeles").document(idAndroid).get().addOnSuccessListener {
                     val contenido = it.data?.get("Portapapeles").toString()
                     if (!(contenido.contains(copiedString))) {
@@ -195,21 +193,7 @@ class CalendarioNotas : AppCompatActivity() {
                     "Portapapeles" to portapapelesGlobal
                 )
 
-                db.collection("ordenes")
-                    .addSnapshotListener { snapshot, e ->
-                        if (e != null) {
-                            Log.d("TAG", "Fallada la escucha de la primitiva.", e)
-                            return@addSnapshotListener
-                        }
-
-                        for (dc in snapshot!!.documentChanges) {
-                            when (dc.type) {
-                                DocumentChange.Type.ADDED -> db.collection("portapapeles")
-                                    .document(idAndroid)
-                                    .update(datosPortapapeles as Map<String, Any>)
-                            }
-                        }
-                    }
+                db.collection("portapapeles").document(idAndroid).set(datosPortapapeles)
             }
         }
     }
