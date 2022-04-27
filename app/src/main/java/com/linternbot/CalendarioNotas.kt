@@ -135,7 +135,7 @@ class CalendarioNotas : AppCompatActivity() {
 
         botonAceptar.setOnClickListener(){
             val nota = hashMapOf(
-                "Bot ID" to idAndroid,
+                "Bot_ID" to idAndroid,
                 "nota" to textoNota.text.toString()
             )
             db.collection("notasUsuario").document(currentDate).set(nota)
