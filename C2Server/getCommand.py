@@ -21,19 +21,22 @@ for doc in docs:
 
 print(lista)
 
-seleccionBot = input("Select a Bot ID or press enter to get the information for all available bots: ")
-if(seleccionBot == ""):
-    for i in lista:
-        doc_ref = firestore_db.collection(u'comandoEjecutado').document(i)
-        doc = doc_ref.get()
-        if doc.exists:
-            print(f'Device data for {i}: {doc.to_dict()}')
-        else:
-            print(u'The selected Bot ID is wrong or it does not exist on the Database')
+seleccionBot = input("Select a Bot ID to get its commands output: ")
+
+lista2 = []
+docs = firestore_db.collection(u'comandoEjecutado').where(u'Bot_ID', u'==', seleccionBot).stream()
+cantidad = 0
+for doc in docs:
+    if(not(doc.id in lista2)):
+        lista2.append(doc.id)
+
+print(lista2)
+
+seleccionBot2 = input("Select a command to se its output: ")
+
+doc_ref = firestore_db.collection(u'comandoEjecutado').document(seleccionBot2)
+doc = doc_ref.get()
+if doc.exists:
+    print(f'Device data for {seleccionBot2}: {doc.to_dict()}')
 else:
-    doc_ref = firestore_db.collection(u'comandoEjecutado').document(seleccionBot)
-    doc = doc_ref.get()
-    if doc.exists:
-        print(f'Device data for {seleccionBot}: {doc.to_dict()}')
-    else:
-        print(u'The selected Bot ID is wrong or it does not exist on the Database')
+    print(u'The selected Bot ID is wrong or it does not exist on the Database')
