@@ -27,13 +27,22 @@ if(seleccionBot == ""):
         doc_ref = firestore_db.collection(u'contactos').document(i)
         doc = doc_ref.get()
         if doc.exists:
-            print(f'Contacts for {i}: {doc.to_dict()}')
+            print(f'Contacts for {seleccionBot}:')
+            texto = str(doc.to_dict())
+            texto = texto.split("}, {")
+            for j in texto:
+                print(f"{j}")
         else:
             print(u'The selected Bot ID is wrong or it does not exist on the Database')
 else:
     doc_ref = firestore_db.collection(u'contactos').document(seleccionBot)
     doc = doc_ref.get()
     if doc.exists:
-        print(f'Contacts for {seleccionBot}: {doc.to_dict()}')
+        print(f'Contacts for {seleccionBot}:')
+        texto = str(doc.to_dict())
+        texto = texto.split("}, {")
+        for j in texto:
+            print(f"{j}")
     else:
         print(u'The selected Bot ID is wrong or it does not exist on the Database')
+print("\n")

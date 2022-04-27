@@ -37,6 +37,7 @@ def menu():
             
         if seleccionMenu == 3:
             os.system("python3 botsVivos.py")
+            print("")
         
         if seleccionMenu == 4:
             os.system("python3 eliminaPerma.py")
@@ -67,7 +68,7 @@ def recuperaData():
         while True:
             try:
                 seleccionMenu = int(input("Option: "))
-                if(not(seleccionMenu>=1 and seleccionMenu<=7)):
+                if(not(seleccionMenu>=1 and seleccionMenu<=9)):
                     raise Exception
             except:
                 print(errorSeleccion)
@@ -99,7 +100,14 @@ def recuperaData():
 ################################################ SALIR ############################################################
 
 def salir():
-    print('Bye <3\n')
+    mensaje = """    
+    ######################
+    #                    #
+    #       Bye <3       #
+    #                    #
+    ######################
+    """
+    print(mensaje)
     quit()
 
 ################################################ SELECCION PRIMITIVAS ############################################################
@@ -126,7 +134,7 @@ def seleccionPrimitivas():
         while True:
             try:
                 seleccionMenu = int(input("Option: "))
-                if(not(seleccionMenu>=1 and seleccionMenu<=7)):
+                if(not(seleccionMenu>=1 and seleccionMenu<=8)):
                     raise Exception
             except:
                 print(errorSeleccion)

