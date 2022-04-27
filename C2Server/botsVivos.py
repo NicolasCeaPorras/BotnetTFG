@@ -30,6 +30,11 @@ for doc in docs:
 
 print(mensajeFin)
 print(lista)
-str1 = ';'.join(str(e) for e in lista)
-fichero = "echo "+ str1 + " > availableBots.txt"
-os.system(fichero)
+if lista:
+    str1 = ';'.join(str(e) for e in lista)
+    fichero = "echo "+ str1 + " > availableBots.txt"
+    os.system(fichero)
+else:
+    str1 = "No available bots"
+    fichero = "echo "+ str1 + " > availableBots.txt"
+    os.system(fichero)
