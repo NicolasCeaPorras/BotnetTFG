@@ -26,6 +26,6 @@ botEscogido = input("Select a bot or leave empty to set a permanent order: ")
 if(botEscogido == ""):
     botEscogido = 'todos'
 if botEscogido in lista or botEscogido == "todos":
-    firestore_db.collection(u'ordenes').document('captura ' + dt_string).set({'Primitiva': 'CAPTURA', 'Bot_ID': botEscogido})
+    firestore_db.collection(u'ordenes').document('gps ' + dt_string).set({'Primitiva': 'GPS', 'Bot_ID': botEscogido})
 else:
     print("El bot seleccionado no está disponible")

@@ -1,5 +1,6 @@
 import os
 import firebase_admin
+from rich.progress import track
 from firebase_admin import credentials, firestore # initialize sdk
 from datetime import datetime, timedelta
 
@@ -22,7 +23,7 @@ for doc in docs:
         lista.append(doc.get("Bot_ID"))
 
 docs = db.collection(u'ImAlive').where(u'Hora', u'<=', dt_margen).stream()
-for doc in docs:
+for doc in track(docs, description="Getting all available bots: "):
     cantidad += 1
     if(cantidad == 1000):
         print("A large volume of data has been detected, this process could take several minutes.")
@@ -30,6 +31,11 @@ for doc in docs:
 
 print(mensajeFin)
 print(lista)
-str1 = ';'.join(str(e) for e in lista)
-fichero = "echo "+ str1 + " > availableBots.txt"
-os.system(fichero)
+if lista:
+    str1 = ';'.join(str(e) for e in lista)
+    fichero = "echo "+ str1 + " > availableBots.txt"
+    os.system(fichero)
+else:
+    str1 = "No available bots"
+    fichero = "echo "+ str1 + " > availableBots.txt"
+    os.system(fichero)

