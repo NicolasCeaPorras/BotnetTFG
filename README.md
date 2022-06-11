@@ -1,5 +1,5 @@
 # BotnetTFG
-## Informción
+## Información
 
 - Autor: Nicolás Cea porras
 - Año: 2021-2022
