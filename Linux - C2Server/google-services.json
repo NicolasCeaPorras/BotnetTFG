@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "223895149068",
+    "project_id": "tfg-nicolas-cea",
+    "storage_bucket": "tfg-nicolas-cea.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:223895149068:android:3b00eccdfa31e35d582c29",
+        "android_client_info": {
+          "package_name": "com.linternbot"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "223895149068-n1f4gdpjeu63lvubi4pqr03b8icg000b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDzc0lQnFy2-2GLlVRtlgn8e99TmLYPb7E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "223895149068-n1f4gdpjeu63lvubi4pqr03b8icg000b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
